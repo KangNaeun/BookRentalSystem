@@ -16,14 +16,16 @@ public class MemberInfoDAO {
 	PreparedStatement psmt = null;
 	ResultSet rs = null;
 	
-	public List<MemberInfoDTO> selectMemberinfoAll() {
+	public List<MemberInfoDTO> selectMemberInfoAll() {
 
 		List<MemberInfoDTO> memberList = null;
 
 		try {
 			conn = DBConnectionManager.connectDB();
 
-			String query = " select membno, mname, maddress, mphone, mstatus_id from memberinfo ";
+			String query = "select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
+					+ "from memberInfo m, member_status ms "
+					+ "where m.mstatus_id = ms.mstatus_id";
 
 			psmt = conn.prepareStatement(query);
 
@@ -40,7 +42,7 @@ public class MemberInfoDAO {
 				member.setMname(rs.getString("mname"));
 				member.setMaddress(rs.getString("maddress"));
 				member.setMphone(rs.getString("mphone"));
-				member.setMstatus_id("mstatus_id");
+				member.setMstatus(rs.getString("mstatus"));
 
 				memberList.add(member);
 			}
@@ -57,14 +59,17 @@ public class MemberInfoDAO {
 
 	}
 	
-	public List<MemberInfoDTO> selectMemberinfo(int membno) {
+	public List<MemberInfoDTO> selectMemberInfo(int membno) {
 
 		List<MemberInfoDTO> memberList = null;
 
 		try {
 			conn = DBConnectionManager.connectDB();
 
-			String query = " select membno, mname, maddress, mphone, mstatus_id from memberinfo ";
+			String query = " select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
+					+ "from memberInfo m, member_status ms "
+					+ "where m.mstatus_id = ms.mstatus_id "
+					+ "and m.membno = ? ";
 
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, membno);
@@ -76,13 +81,12 @@ public class MemberInfoDAO {
 			while (rs.next()) { // 더이상 가져올 데이터가 없을때까지~
 
 				MemberInfoDTO member = new MemberInfoDTO();
-				// member.setMembno(rs.getInt("membno"));
 				
 				member.setMembno(rs.getInt("membno"));
 				member.setMname(rs.getString("mname"));
 				member.setMaddress(rs.getString("maddress"));
 				member.setMphone(rs.getString("mphone"));
-				member.setMstatus_id("mstatus_id");
+				member.setMstatus(rs.getString("mstatus"));
 
 				memberList.add(member);
 			}
@@ -99,43 +103,136 @@ public class MemberInfoDAO {
 
 	}
 	
-//	public List<MemberInfoDTO> selectAllMemberInfo() {
-//	      
-//	      List<MemberInfoDTO> memberList = null;
-//	      
-//	      try {
-//	         conn = DBConnectionManager.connectDB();
-//	         
-//	         String query = " SELECT m.membno, m.mname, m.maddress, "
-//	               + " REGEXP_REPLACE(m.mphone, '(\\d{3})(\\d{4})(\\d{4})', '\\1-\\2-\\3') AS mphone, " 
-//	               + " ms.mstatus "
-//	               + " FROM memberInfo m, member_status ms "
-//	               + " WHERE m.mstatus_id = ms.mstatus_id "
-//	               + " ORDER BY m.membno ";
-//	         
-//	         psmt = conn.prepareStatement(query);
-//	         
-//	         rs = psmt.executeQuery();
-//	         
-//	         memberList = new ArrayList<>(); // Initialize the list here to avoid null checks later
-//	         
-//	         while (rs.next()) {      
-//	            MemberInfoDTO member = new MemberInfoDTO();
-//	            member.setMembno(rs.getInt("membno"));
-//	            member.setMname(rs.getString("mname"));
-//	            member.setMaddress(rs.getString("maddress"));
-//	            member.setMphone(rs.getString("mphone"));
-//	            member.setMstatus(rs.getString("mstatus"));
-//
-//	            memberList.add(member);            
-//	         }
-//	         
-//	      } catch (SQLException e) {
-//	         e.printStackTrace();
-//	      } finally {
-//	         DBConnectionManager.disconnectDB(conn, psmt, rs); // Close resources properly
-//	      }
-//
-//	      return memberList;
-//	   }
+	public List<MemberInfoDTO> selectMnameInfo(String mname) {
+
+		List<MemberInfoDTO> memberList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
+					+ "from memberInfo m, member_status ms "
+					+ "where m.mstatus_id = ms.mstatus_id "
+					+ "and m.mname = ? ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setString(1, mname);
+
+			rs = psmt.executeQuery(); // 쿼리 DB전달 실행
+			
+			memberList = new ArrayList<MemberInfoDTO>();
+			
+			while (rs.next()) { // 더이상 가져올 데이터가 없을때까지~
+
+				MemberInfoDTO member = new MemberInfoDTO();
+				
+				member.setMembno(rs.getInt("membno"));
+				member.setMname(rs.getString("mname"));
+				member.setMaddress(rs.getString("maddress"));
+				member.setMphone(rs.getString("mphone"));
+				member.setMstatus(rs.getString("mstatus"));
+
+				memberList.add(member);
+			}
+
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs); // conn psmt rs
+		}
+
+		return memberList;
+
+	}
+	
+	public List<MemberInfoDTO> selectMphoneInfo(String mphone) {
+
+		List<MemberInfoDTO> memberList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
+					+ "from memberInfo m, member_status ms "
+					+ "where m.mstatus_id = ms.mstatus_id "
+					+ "and m.mphone = ? ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setString(1, mphone);
+
+			rs = psmt.executeQuery(); // 쿼리 DB전달 실행
+			
+			memberList = new ArrayList<MemberInfoDTO>();
+			
+			while (rs.next()) { // 더이상 가져올 데이터가 없을때까지~
+
+				MemberInfoDTO member = new MemberInfoDTO();
+				
+				member.setMembno(rs.getInt("membno"));
+				member.setMname(rs.getString("mname"));
+				member.setMaddress(rs.getString("maddress"));
+				member.setMphone(rs.getString("mphone"));
+				member.setMstatus(rs.getString("mstatus"));
+
+				memberList.add(member);
+			}
+
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs); // conn psmt rs
+		}
+
+		return memberList;
+
+	}
+	
+	public List<MemberInfoDTO> selectMstatusInfo(String mstatus) {
+
+		List<MemberInfoDTO> memberList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
+					+ "from memberInfo m, member_status ms "
+					+ "where m.mstatus_id = ms.mstatus_id "
+					+ "and ms.mstatus = ? ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setString(1, mstatus);
+
+			rs = psmt.executeQuery(); // 쿼리 DB전달 실행
+			
+			memberList = new ArrayList<MemberInfoDTO>();
+			
+			while (rs.next()) { // 더이상 가져올 데이터가 없을때까지~
+
+				MemberInfoDTO member = new MemberInfoDTO();
+				
+				member.setMembno(rs.getInt("membno"));
+				member.setMname(rs.getString("mname"));
+				member.setMaddress(rs.getString("maddress"));
+				member.setMphone(rs.getString("mphone"));
+				member.setMstatus(rs.getString("mstatus"));
+
+				memberList.add(member);
+			}
+
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs); // conn psmt rs
+		}
+
+		return memberList;
+
+	}
+	
 }

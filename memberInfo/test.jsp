@@ -100,35 +100,39 @@ form button {
 	</div>
 
 	<div class="section-title">회원 정보</div>
-	
-	<%
-		int membNo = Integer.parseInt(request.getParameter("membNo"));
-	
-		MemberInfoDAO memberDAO = new MemberInfoDAO();
-		List<MemberInfoDTO> memberList = memberDAO.selectMemberinfoAll();
-		
-	%>
-	<form action="test.jsp" method="post">
-		<div class="search-box">
-			<div class="search-group">
-				<input type="text" id="customerSearch1" placeholder="회원번호">
-				<button onclick="searchTable('customerSearch1', 'customerTable')">검색</button>
-			</div>
-			<div class="search-group">
-				<input type="text" id="customerSearch2" placeholder="회원명">
-				<button onclick="searchTable('customerSearch2', 'customerTable')">검색</button>
-			</div>
-			<div class="search-group">
-				<input type="text" id="customerSearch3" placeholder="휴대폰번호">
-				<button onclick="searchTable('customerSearch3', 'customerTable')">검색</button>
-			</div>
-			<div class="search-group">
-				<input type="text" id="customerSearch4" placeholder="대여상태">
-				<button onclick="searchTable('customerSearch4', 'customerTable')">검색</button>
-			</div>
+
+	<div class="search-box">
+		<div class="search-group">
+			<form action='test.jsp' method="post" id="frm_membno">
+				<input type="text" id="input_membno" name="membno"
+					placeholder="회원번호">
+				<button type="submit">검색</button>
+			</form>
 		</div>
-	</form>
-	
+		<div class="search-group">
+			<form action='test.jsp' method='post' id="frm_mname">
+				<input type="text" id="input_mname" name="mname" placeholder="회원명">
+				<button type="submit">검색</button>
+			</form>
+		</div>
+		<div class="search-group">
+			<form action='test.jsp' method='post' id="frm_mphone">
+				<input type="text" id="input_mphone" name="mphone"
+					placeholder="휴대폰번호">
+				<button type="submit">검색</button>
+			</form>
+		</div>
+		<div class="search-group">
+			<form action='test.jsp' method='post' id="frm_mstatus">
+				<input type="text" id="input_mstatus" name="mstatus"
+					placeholder="대여상태">
+				<button type="submit">검색</button>
+			</form>
+		</div>
+	</div>
+
+
+
 	<table id="customerTable">
 		<thead>
 			<tr>
@@ -140,17 +144,68 @@ form button {
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-			<%if(customerSearch1 ==null || customerSearch1 == ''){
-				for (MemberInfoDTO member : memberList) { %>
+			<%
+			request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
+
+			MemberInfoDAO memberDAO = new MemberInfoDAO();
+			List<MemberInfoDTO> memberList = null;
+/* 
+			System.out.println("---------------------------");
+			System.out.println(request.getParameter("membno"));
+			System.out.println("---------------------------"); */
+
+			String mname = request.getParameter("mname");
+		
+			String mphone = request.getParameter("mphone");
+
+			String mstatus = request.getParameter("mstatus");
+			
+			//System.out.println(request.getMethod());
+
+		
+			if (request.getParameter("membno") != null && request.getParameter("membno") != "") {
+				int membno = Integer.parseInt(request.getParameter("membno"));
+				//memberList = select(membno); 함수추가
+				memberList = memberDAO.selectMemberInfo(membno);
+			} else if (request.getParameter("mname") != null && request.getParameter("mname") != "") {
+				//memberList = select(mname);함수추가
+				memberList = memberDAO.selectMnameInfo(mname);
+			} else if (request.getParameter("mphone") != null && request.getParameter("mphone") != "") {
+				//memberList = select(phone);함수추가
+				memberList = memberDAO.selectMphoneInfo(mphone);
+			} else if (request.getParameter("mstatus") != null && request.getParameter("mstatus") != "") {
+				//memberList = select(mstatus);함수추가
+				memberList = memberDAO.selectMstatusInfo(mstatus);
+				
+			} else if ((request.getParameter("membno") == null || request.getParameter("membno") == "") && request.getMethod().equals("POST")) {
+				memberList = memberDAO.selectMemberInfoAll();
+			} else if ((request.getParameter("mphone") == null || request.getParameter("mphone") == "") && request.getMethod().equals("POST")) {
+				memberList = memberDAO.selectMemberInfoAll();
+			} else if ((request.getParameter("mstatus") == null || request.getParameter("mstatus") == "") && request.getMethod().equals("POST")) {
+				memberList = memberDAO.selectMemberInfoAll();
 			}
-				<td><%=member.getMembno()%></td>
-				<td><%=member.getMname()%></td>
-				<td><%=member.getMphone()%></td>
-				<td><%=member.getMaddress()%></td>
-				<td><%=member.getMstatus_id()%></td>
-			<% 	} %>
-			</tr>
+			%>
+
+			<%
+			if (memberList != null) {
+			%>
+			<%
+				for (MemberInfoDTO member : memberList) {
+				%>
+				<tr>
+					<td><%=member.getMembno()%></td>
+					<td><%=member.getMname()%></td>
+					<td><%=member.getMphone()%></td>
+					<td><%=member.getMaddress()%></td>
+					<td><%=member.getMstatus()%></td>
+				</tr>
+				<%
+				}
+			}
+			%>
+
+
+
 		</tbody>
 	</table>
 

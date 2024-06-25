@@ -6,7 +6,7 @@ public class MemberInfoDTO {
 	String mname;
 	String maddress;
 	String mphone;
-	String mstatus_id;
+	String mstatus;
 	
 	// 생성자
 	public MemberInfoDTO() {
@@ -46,15 +46,13 @@ public class MemberInfoDTO {
 		this.mphone = mphone;
 	}
 
-	public String getMstatus_id() {
-		return mstatus_id;
+	public String getMstatus() {
+		return mstatus;
 	}
 
-	public void setMstatus_id(String mstatus_id) {
-		this.mstatus_id = mstatus_id;
+	public void setMstatus(String mstatus) {
+		this.mstatus = mstatus;
 	}
-		
-	
-	
+
+
 }
-
