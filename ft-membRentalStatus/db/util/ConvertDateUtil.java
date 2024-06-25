@@ -26,6 +26,15 @@ public class ConvertDateUtil {
 		LocalDateTime ldt = ld.atStartOfDay();
 		return ldt;
 	}
+	
+public static LocalDateTime convertStringToLocalDateTime4(String str) {
+		
+		// 2024-06-01
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDate ld = LocalDate.parse(str, dtf);
+		LocalDateTime ldt = ld.atStartOfDay();
+		return ldt;
+	}
 
 	public static LocalDateTime convertStringToLocalDateTime2(String str) {
 
