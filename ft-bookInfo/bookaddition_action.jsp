@@ -1,4 +1,4 @@
-<%@ page import="db.dao.TestDAO" %>
+<%@ page import="db.dao.BookDAO" %>
 <%@ page import="db.dto.BookDTO" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -41,11 +41,11 @@
 		String bdate = request.getParameter("bdate");
 		int bcount = Integer.parseInt(request.getParameter("bcount"));
 	
-		TestDAO testDAO = new TestDAO();
+		BookDAO bookDAO = new BookDAO();
 		
 		//낱개 저장
-		int result = testDAO.bookaddition(bname, bauthor, bpublish, bprice, genrno, bdate);
-		int result2 = testDAO.bookquantity(bcount);	
+		int result = bookDAO.bookaddition(bname, bauthor, bpublish, bprice, genrno, bdate);
+		int result2 = bookDAO.bookquantity(bcount);	
 		if ( result > 0 && result2 >0){
 	%>
 		<script>
