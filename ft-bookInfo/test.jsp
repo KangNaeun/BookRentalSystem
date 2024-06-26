@@ -179,9 +179,11 @@
         <h1> 도서 추가</h1>
         <form action="bookaddition_action.jsp" method="post" id="frm_book">
             <label> 책 이름 : <input type="text" id="input_bname" name="bname"> </label><br />
-            <label> 저자 : <input type="text" id="input_bauthor" name="bauthor"> </label><br />
+            <label> 저자 : &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="input_bauthor"
+                    name="bauthor"> </label><br />
             <label> 출판사 : <input type="text" id="input_bpublish" name="bpublish"> </label><br />
-            <label> 가격 : <input type="text" id="input_bprice" name="bprice"> </label><br />
+            <label> 가격 : &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="input_bprice"
+                    name="bprice"> </label><br />
             <label> 분류번호 :
                 <select name="genrno">
                     <option id="input_genrno">소설</option>
@@ -191,7 +193,9 @@
                     <option id="input_genrno">만화</option>
                 </select>
             </label><br />
-            <label> 발행일 : <input type="date" id="input_bdate" name="bdate"> </label><br /><br />
+            <label> 발행일 : <input type="date" id="input_bdate" name="bdate"> </label><br />
+            <label> 수량 : &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" id="input_bdate"
+                    name="bcount"> </label><br /><br />
             <button type="submit" id="btn"> 도서 추가 </button>
         </form>
     </div>
