@@ -79,3 +79,25 @@ form button {
 .search-group button:hover {
     background-color: #bbb;
 }
+
+.right{
+    float: right;
+}
+
+.bookadd {
+    border : 1px solid black;
+    width: 600px;
+    height: 500px;
+    background-color: #dcdcdc;
+    position: fixed;
+    top: 20%;
+    left: 25%;
+    display: none;
+    text-align: center;
+}
+
+#btn{
+    border: 1px solid black;
+}
+
+
