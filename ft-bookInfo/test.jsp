@@ -1,8 +1,12 @@
-<%@ page import="db.dao.TestDAO" %>
+<%@ page import="db.dao.BookDAO" %>
+<%@ page import="db.dto.BookDTO" %>
+<%@ page import="db.dto.Book2DTO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -169,31 +173,49 @@
         </tbody>
     </table>
 
+	<!-- <form action="login_action.jsp" method="post">
+		아이디 : <input type="text" name="id"> <br>
+		비밀번호 : <input type="password" name="pw"> <br>
+		<button type="submit">로그인</button>
+	</form> -->
+
     <div class="section-title">도서 정보</div>
     <div class="search-box">
         <div class="search-group">
-            <input type="text" id="loanSearch1" placeholder="도서번호">
-            <button onclick="searchTable('loanSearch1', 'loanTable')">검색</button>
+        	<form action="test.jsp" method="post" id="frm_bookno">
+	            <input type="text" id="loanSearch1" placeholder="도서번호" name="bookno">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch1" placeholder="도서제목">
-            <button onclick="searchTable('loanSearch1', 'loanTable')">검색</button>
+        	<form action="test.jsp" method="post">
+	            <input type="text" id="loanSearch1" placeholder="도서제목" name="bname">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="장르명">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="test.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="장르명" name="gname">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="저자">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="test.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="저자" name="bauthor">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="출판사">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="test.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="출판사" name="bpublish">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="재고">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="test.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="재고" name="bcount">
+	            <button type="submit">검색</button>
+            </form>
         </div>
     </div>
     <table id="loanTable">
@@ -210,17 +232,101 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1000</td>
-                <td>아이가 없는 집</td>
-                <td>알렉스 안도릴</td>
-                <td>필름</td>
-                <td>16,200원</td>
-                <td>소설</td>
-                <td>2024.06.12</td>
-                <td>3</td>
-            </tr>
-        </tbody>
+    <%
+    	request.setCharacterEncoding("UTF-8");
+ 		
+		BookDAO bookDAO = new BookDAO();
+		List<Book2DTO> getBookList = null;
+       	boolean isEmptyStr = false;
+       	List<String> db_params = new ArrayList<>();
+       	String targetStr = null;
+       	int targetNo = 0;
+		
+		String booknoSTR = request.getParameter("bookno");
+		String bname = request.getParameter("bname");
+		String bauthor = request.getParameter("bauthor");
+		String bpublish = request.getParameter("bpublish");
+		String gname = request.getParameter("gname");
+		String bcountSTR = request.getParameter("bcount");	
+		
+		String[] params = new String[] {booknoSTR, bname, bauthor, bpublish, gname, bcountSTR};
+		
+		for (String param : params) {           		
+   			if (param != null) {
+   				db_params.add(param);
+   			}
+       	}
+       	
+       	if (db_params.size() != params.length) {
+       		for (String param : db_params) {
+       			if (param.equals("")) {
+       				isEmptyStr = true;
+       				break;
+       			}
+       		}
+       	}
+       	
+       	if (!isEmptyStr) {
+       		for (int i = 0; i < params.length; i++) {
+       			if (params[i] != null) {
+       				targetStr = params[i];
+       				targetNo = i;
+       				break;
+       			}
+       		}
+       		
+       		if (targetStr != null) {      			
+       			switch (targetNo) {
+       				case 0:
+       					int bookno = Integer.parseInt(booknoSTR);
+       					getBookList = bookDAO.getBookNoList(bookno);
+       	           		break;
+       				case 1:
+       					getBookList = bookDAO.getBookNameList(bname);
+       	           		break;
+       				case 2:
+       					getBookList = bookDAO.getBookAuthorList(bauthor);
+       	           		break;
+       				case 3:
+       					getBookList = bookDAO.getBookPublishList(bpublish);
+       	           		break;
+       				case 4:
+       					getBookList = bookDAO.getBookGnameList(gname);
+       	           		break;
+       				case 5:
+       					int bcount = Integer.parseInt(bcountSTR);
+       					getBookList = bookDAO.getBookCountList(bcount);
+       	           		break;
+       			}           			
+       		}
+       	}
+       	
+       	if (isEmptyStr) {
+       		getBookList = bookDAO.getBookList();
+       	}
+		
+       	if(getBookList != null){
+			for(Book2DTO bookList : getBookList) {
+		%>				
+	            <tr>
+	                <td><%=bookList.getBookno()%></td>
+	                <td><%=bookList.getBname()%></td>
+	                <td><%=bookList.getBauthor()%></td>
+	                <td><%=bookList.getBpublish()%></td>
+	                <td><%=bookList.getBprice()%></td>
+	                <td><%=bookList.getGname()%></td>
+	                <td><%=bookList.getBdate()%></td>
+	                <td><%=bookList.getBcount()%></td>
+	            </tr>       
+		<%	
+		  	}
+		}
+		%>
+	
+
+		
+	        
+ 	</tbody>
     </table>
 
     <script src="js/script.js"></script>

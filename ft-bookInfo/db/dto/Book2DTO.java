@@ -1,26 +1,15 @@
 package db.dto;
 
-public class BookDTO {
+public class Book2DTO {
 	int bookno;
 	String bname;
 	String bauthor;
 	String bpublish;
 	int bprice;
-	int genrno;
+	String gname;
+	String bdate;
+	int bcount;
 	
-
-	public BookDTO(String bname, String bauthor, String bpublish, int bprice, int genrno) {
-		super();
-		this.bname = bname;
-		this.bauthor = bauthor;
-		this.bpublish = bpublish;
-		this.bprice = bprice;
-		this.genrno = genrno;
-	}
-	public BookDTO() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
 	public int getBookno() {
 		return bookno;
 	}
@@ -51,23 +40,28 @@ public class BookDTO {
 	public void setBprice(int bprice) {
 		this.bprice = bprice;
 	}
-	public int getGenrno() {
-		return genrno;
+	public String getGname() {
+		return gname;
 	}
-	public void setGenrno(int genrno) {
-		this.genrno = genrno;
+	public void setGname(String gname) {
+		this.gname = gname;
 	}
-	public BookDTO(int bookno, String bname, String bauthor, String bpublish, int bprice, int genrno) {
+	public String getBdate() {
+		return bdate;
+	}
+	public void setBdate(String bdate) {
+		this.bdate = bdate;
+	}
+	public int getBcount() {
+		return bcount;
+	}
+	public void setBcount(int bcount) {
+		this.bcount = bcount;
+	}
+	public Book2DTO() {
 		super();
-		this.bookno = bookno;
-		this.bname = bname;
-		this.bauthor = bauthor;
-		this.bpublish = bpublish;
-		this.bprice = bprice;
-		this.genrno = genrno;
 	}
-	
-	
+		
 	
 	
 	
