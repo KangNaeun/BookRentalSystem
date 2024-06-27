@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import db.dto.Book2DTO;
+import db.dto.Book3DTO;
 import db.dto.BookDTO;
 import db.dto.TestDTO;
 import db.util.DBConnectionManager;
@@ -510,6 +511,46 @@ public class BookDAO {
 		}
 
 		return result;
+	}
+
+	public List<Book3DTO> getBookRanking() {
+
+		List<Book3DTO> bookList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " SELECT b.bname, b.bauthor, COUNT(r.bookno) AS rental_count "
+					+ " FROM rental r JOIN book b ON r.bookno = b.bookno "
+					+ " GROUP BY r.bookno, b.bname, b.bauthor "
+					+ " ORDER BY rental_count DESC "
+					+ " FETCH FIRST 5 ROWS ONLY ";
+
+			psmt = conn.prepareStatement(query);
+
+			rs = psmt.executeQuery(); // 쿼리 DB전달 실행
+
+			while (rs.next()) {
+				if (bookList == null)
+					bookList = new ArrayList<Book3DTO>();
+
+				Book3DTO book = new Book3DTO();
+
+				book.setBname(rs.getString("bname"));
+				book.setBauthor(rs.getString("bauthor"));
+				book.setBookno(rs.getInt("rental_count"));
+
+				bookList.add(book);
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return bookList;
 	}
 
 }
