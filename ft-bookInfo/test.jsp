@@ -2,6 +2,7 @@
 <%@ page import="db.dto.BookDTO" %>
 <%@ page import="db.dto.Book2DTO" %>
 <%@ page import="db.dto.Book3DTO" %>
+<%@ page import="db.dto.EmployeeDTO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -19,7 +20,44 @@
     <div class="header">
         <h1>도서 대여 시스템</h1>
     </div>
-
+	<div class="section-title">"OOO"님 환영합니다.<button class="right" onclick="employeeClick()">관리자 공지사항</button></div><br/>
+	<div class="employee" id="employee">
+	    <h1> 관리자 공지사항 </h1><br/>
+        <button class="right" id="btn" onclick="communityClick()"> 공지 추가 </button><br/><br/>
+        	<div class="community" id="community">
+        		<h3> 공지사항 추가 </h3><br/>
+		        <form action="community_action.jsp" method="post" id="frm_community">
+	            <label> 직원 번호 : <input type ="text" id="input_empno" name= "empno"> </label><br/><br/>
+	            <label> 메시지 : &nbsp;&nbsp;&nbsp;<input type ="text" id="input_message" name= "message"> </label><br/><br/><br/>
+	            <button type = "submit" id="btn"> 공지 추가 </button>
+        		</form>	        
+        	</div>
+        <table id="rankingTable">
+    	<thead>
+       		<tr>
+	            <th>직원 번호</th>
+	            <th>메시지</th>
+	            <th>공지 날짜</th>
+	        </tr>
+	     </thead>
+	     <tbody>
+	     	<%
+	     		BookDAO bookDAO = new BookDAO();
+				List<EmployeeDTO> employeeList = bookDAO.getCommunityList();
+				
+				for(EmployeeDTO employee : employeeList) {	
+			%>
+	     	<tr>
+                <td><%=employee.getEmpno()%></td>
+                <td><%=employee.getMessage()%></td>
+                <td><%=employee.getSend_date()%></td>
+            </tr>
+            <%
+				}
+			%> 
+	    </tbody>
+	    </table>          
+    </div>
     <div class="section-title">회원 정보</div>
     <div class="search-box">
         <div class="search-group">
@@ -185,15 +223,15 @@
             <label> 가격 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bprice" name= "bprice"> </label><br/>
             <label> 분류번호 :     
                 <select name="genrno">
-                    <option id="input_genrno" >소설</option>
-                    <option id="input_genrno" >시/에세이</option>
-                    <option id="input_genrno" >경제/경영</option>
-                    <option id="input_genrno" >자기계발</option>
-                    <option id="input_genrno" >만화</option>
+                    <option id="input_genrno"> 소설 </option>
+                    <option id="input_genrno"> 시/에세이 </option>
+                    <option id="input_genrno"> 경제/경영 </option>
+                    <option id="input_genrno"> 자기계발 </option>
+                    <option id="input_genrno"> 만화 </option>
                 </select> 
             </label><br/>
             <label> 발행일 : <input type ="date" id="input_bdate" name= "bdate"> </label><br/>
-            <label> 수량 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bdate" name= "bcount"> </label><br/><br/>
+            <label> 수량 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bcount" name= "bcount"> </label><br/><br/>
             <button type = "submit" id="btn"> 도서 추가 </button>
         </form>
     </div>
@@ -260,7 +298,7 @@
     <%
     	request.setCharacterEncoding("UTF-8");
  		
-		BookDAO bookDAO = new BookDAO();
+		
 		List<Book2DTO> getBookList = null;
        	boolean isEmptyStr = false;
        	List<String> db_params = new ArrayList<>();
@@ -346,7 +384,7 @@
        	if(getBookList != null){
 			for(Book2DTO bookList : getBookList) {
 		%>				
-	            <tr>
+	             <tr>
 	                <td><%=bookList.getBookno()%></td>
 	                <td><%=bookList.getBname()%></td>
 	                <td><%=bookList.getBauthor()%></td>
@@ -363,31 +401,27 @@
  	</tbody>
     </table>
     <table id="rankingTable">
-    <div class="section-title">인기 도서
-    	<span><form action="test.jsp" method="post">
-        </form></span>
-    </div>
+    <div class="section-title">인기 도서</div>
     	<thead>
          	<tr>
-	            <th>도서 제목</th>
-	            <th>저자</th>
-	            <th>대여 횟수</th>
+	             <th>도서 제목</th>
+	             <th>저자</th>
+	             <th>대여 횟수</th>
 	         </tr>
-	    </thead>
-	    <tbody>
+	     </thead>
+	     <tbody>
 	     	<%
-				List<Book3DTO> bookList = bookDAO.getBookRanking();
-		
-				for(Book3DTO book : bookList) {	
+				List<Book3DTO> book3List = bookDAO.getBookRanking();
+				for(Book3DTO book : book3List) {	
 			%>
 	     	<tr>
                 <td><%=book.getBname()%></td>
                 <td><%=book.getBauthor()%></td>
                 <td><%=book.getBookno()%></td>
             </tr>
-            	<%
-					}
-				%> 
+            <%
+				}
+			%> 
 	     </tbody>
     </table>
 

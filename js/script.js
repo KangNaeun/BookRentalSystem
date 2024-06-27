@@ -1,24 +1,3 @@
-function searchTable(inputId, tableId) {
-    var input, filter, table, tr, td, i, j, txtValue;
-    input = document.getElementById(inputId);
-    filter = input.value.toLowerCase();
-    table = document.getElementById(tableId);
-    tr = table.getElementsByTagName("tr");
-
-    for (i = 1; i < tr.length; i++) {
-        tr[i].style.display = "none";
-        td = tr[i].getElementsByTagName("td");
-        for (j = 0; j < td.length; j++) {
-            if (td[j]) {
-                txtValue = td[j].textContent || td[j].innerText;
-                if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                    break;
-                }
-            }
-        }
-    }
-}
 
 function btnClick() {
     const mydiv = document.getElementById('bookadd');
@@ -39,6 +18,7 @@ frm_book.addEventListener('submit', (e)=>{
     let input_bprice = document.getElementById('input_bprice');
     let input_genrno = document.getElementById('input_genrno');
     let input_bdate = document.querySelector('#input_bdate');
+    let input_bcount = document.querySelector('#input_bcount');
 
     input_bname.value = input_bname.value.trim();
     input_bauthor.value = input_bauthor.value.trim();
@@ -46,36 +26,41 @@ frm_book.addEventListener('submit', (e)=>{
     input_bprice.value = input_bprice.value.trim();
     input_genrno.value = input_genrno.value.trim();
     input_bdate.value = input_bdate.value.trim();
+    input_bcount.value = input_bcount.value.trim();
     
     if(input_bname.value.trim() == '' || input_bname.value == null ){	//.trim() -> 띄어쓰기 빈칸이 있는지 확인!
         alert('책 이름은 필수 입력입니다.');
-        input_deptno.focus();
+        input_bname.focus();
         return false;
     }
     if(input_bauthor.value.trim() == '' || input_bname.value == null ){
         alert('저자는 필수 입력입니다.');
-        input_dname.focus();
+        input_bauthor.focus();
         return false;
     }
-
     if(input_bpublish.value.trim() == '' || input_bname.value == null ){
         alert('출판사는 필수 입력입니다.');
-        input_loc.focus();
+        input_bpublish.focus();
         return false;
     }
     if(input_bprice.value.trim() == '' || input_bname.value == null ){
         alert('가격은 필수 입력입니다.');
-        input_loc.focus();
+        input_bprice.focus();
         return false;
     }
     if(input_genrno.value.trim() == '' || input_bname.value == null ){
-        alert('분류번호는 필수 입력입니다.');
-        input_loc.focus();
+        alert('분류이름은 필수 입력입니다.');
+        input_genrno.focus();
         return false;
     }
     if(input_bdate.value.trim() == '' || input_bname.value == null ){
-        alert('분류번호는 필수 입력입니다.');
-        input_loc.focus();
+        alert('날짜는 필수 입력입니다.');
+        input_bdate.focus();
+        return false;
+    }
+    if(input_bcount.value.trim() == '' || input_bname.value == null ){
+        alert('수량은 필수 입력입니다.');
+        input_bcount.focus();
         return false;
     }
     
@@ -84,5 +69,35 @@ frm_book.addEventListener('submit', (e)=>{
     frm_book.submit();
     
 });	
+
+
+function bookqClick() {
+    const mydiv = document.getElementById('bookq');
+    if (mydiv.style.display === 'none') {
+        mydiv.style.display = 'block';
+    } else {
+        mydiv.style.display = 'none';
+    }
+}
+
+function employeeClick() {
+	    const mydiv = document.getElementById('employee');
+    if (mydiv.style.display === 'none') {
+        mydiv.style.display = 'block';
+    } else {
+        mydiv.style.display = 'none';
+    }
+}
+
+function communityClick() {
+	    const mydiv = document.getElementById('community');
+    if (mydiv.style.display === 'none') {
+        mydiv.style.display = 'block';
+    } else {
+        mydiv.style.display = 'none';
+    }
+}
+
+
 
 
