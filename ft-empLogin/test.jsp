@@ -1,12 +1,14 @@
-<%@ page import="db.dao.BookDAO"%>
-<%@ page import="db.dto.BookDTO"%>
-<%@ page import="db.dto.Book2DTO"%>
-<%@ page import="java.util.List"%>
-<%@ page import="java.util.ArrayList"%>
+<%@ page import="db.dao.BookDAO" %>
+<%@ page import="db.dto.BookDTO" %>
+<%@ page import="db.dto.Book2DTO" %>
+<%@ page import="db.dto.Book3DTO" %>
+<%@ page import="db.dto.EmployeeDTO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,12 +16,57 @@
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-
-    <div class="header">
-        <h1>도서 대여 시스템</h1>
+   	<%
+	//로그인 입력한 값을 기준으로 누구인지 확인
+	request.setCharacterEncoding("UTF-8");
+   	String ename = (String) session.getAttribute("ename");
+   	if (ename != null) {
+	%>
+    <div class="header"><h1>도서 대여 시스템</h1></div>
+	<div class="section-title">"<%=ename %>"님 환영합니다.<button class="right" onclick="employeeClick()">관리자 공지사항</button></div><br/>
+	<div class="employee" id="employee">
+	    <h1> 관리자 공지사항 </h1><br/>
+        <button class="right" id="btn" onclick="communityClick()"> 공지 추가 </button><br/><br/>
+        	<div class="community" id="community">
+        		<h3> 공지사항 추가 </h3><br/>
+		        <form action="community_action.jsp" method="post" id="frm_community">
+	            <label> 직원 번호 : <input type ="text" id="input_empno" name= "empno"> </label><br/><br/>
+	            <label> 메시지 : &nbsp;&nbsp;&nbsp;<input type ="text" id="input_message" name= "message"> </label><br/><br/><br/>
+	            <button type = "submit" id="btn"> 공지 추가 </button>
+        		</form>	        
+        	</div>
+        <table id="rankingTable">
+    	<thead>
+       		<tr>
+	            <th>직원 번호</th>
+	            <th>메시지</th>
+	            <th>공지 날짜</th>
+	        </tr>
+	     </thead>
+	     <tbody>
+	     	<%
+	     		BookDAO bookDAO = new BookDAO();
+				List<EmployeeDTO> employeeList = bookDAO.getCommunityList();
+				
+				for(EmployeeDTO employee : employeeList) {	
+			%>
+	     	<tr>
+                <td><%=employee.getEmpno()%></td>
+                <td><%=employee.getMessage()%></td>
+                <td><%=employee.getSend_date()%></td>
+            </tr>
+            <%
+				}
+			%> 
+	    </tbody>
+	    </table>          
     </div>
-
-    <div class="section-title">회원 정보</div>
+    <div class="section-title">회원 정보<button class="right" onclick="logOut()">log out</button></div>
+    <script>
+	function logOut(){
+	location.href="logout_action.jsp";
+	}
+	</script>
     <div class="search-box">
         <div class="search-group">
             <input type="text" id="customerSearch1" placeholder="회원번호">
@@ -172,32 +219,74 @@
             </tr>
         </tbody>
     </table>
-
-    <div class="section-title">도서 정보</div>
+    <div class="section-title">도서 정보<button class="right" onclick="btnClick()">도서추가</button>
+    	<button class="right" onclick="bookqClick()">도서 수량 업데이트</button>
+    </div>
+    <div class="bookadd" id="bookadd">
+        <h1> 도서 추가</h1>
+        <form action="bookaddition_action.jsp" method="post" id="frm_book">
+            <label> 책 이름 : <input type ="text" id="input_bname" name= "bname"> </label><br/>
+            <label> 저자 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bauthor" name= "bauthor"> </label><br/>
+            <label> 출판사 : <input type ="text" id="input_bpublish" name= "bpublish"> </label><br/>
+            <label> 가격 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bprice" name= "bprice"> </label><br/>
+            <label> 분류번호 :     
+                <select name="genrno">
+                    <option id="input_genrno"> 소설 </option>
+                    <option id="input_genrno"> 시/에세이 </option>
+                    <option id="input_genrno"> 경제/경영 </option>
+                    <option id="input_genrno"> 자기계발 </option>
+                    <option id="input_genrno"> 만화 </option>
+                </select> 
+            </label><br/>
+            <label> 발행일 : <input type ="date" id="input_bdate" name= "bdate"> </label><br/>
+            <label> 수량 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bcount" name= "bcount"> </label><br/><br/>
+            <button type = "submit" id="btn"> 도서 추가 </button>
+        </form>
+    </div>
+    <div class="bookq" id="bookq">
+        <h1> 도서 수량 업데이트 </h1><br/>
+        <form action="bookquantity_action.jsp" method="post" id="frm_bookq">
+            <label> 책 번호 : <input type ="text" id="input_bookno" name= "bookno"> </label><br/><br/>
+            <label> 수량 : &nbsp;&nbsp;&nbsp;&nbsp;<input type ="text" id="input_bcount" name= "bcount"> </label><br/><br/><br/>
+            <button type = "submit" id="btn"> 도서 수량 업데이트 </button>
+        </form>
+    </div>
     <div class="search-box">
         <div class="search-group">
-            <input type="text" id="loanSearch1" placeholder="도서번호">
-            <button onclick="searchTable('loanSearch1', 'loanTable')">검색</button>
+        	<form action="ers.jsp" method="post" id="frm_bookno">
+	            <input type="text" id="loanSearch1" placeholder="도서번호" name="bookno">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch1" placeholder="도서제목">
-            <button onclick="searchTable('loanSearch1', 'loanTable')">검색</button>
+        	<form action="ers.jsp" method="post">
+	            <input type="text" id="loanSearch1" placeholder="도서제목" name="bname">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="장르명">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="ers.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="장르명" name="gname">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="저자">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="ers.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="저자" name="bauthor">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="출판사">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="ers.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="출판사" name="bpublish">
+	            <button type="submit">검색</button>
+            </form>
         </div>
         <div class="search-group">
-            <input type="text" id="loanSearch2" placeholder="재고">
-            <button onclick="searchTable('loanSearch2', 'loanTable')">검색</button>
+        	<form action="ers.jsp" method="post">
+	            <input type="text" id="loanSearch2" placeholder="재고" name="bcount">
+	            <button type="submit">검색</button>
+            </form>
         </div>
     </div>
     <table id="loanTable">
@@ -214,19 +303,145 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>1000</td>
-                <td>아이가 없는 집</td>
-                <td>알렉스 안도릴</td>
-                <td>필름</td>
-                <td>16,200원</td>
-                <td>소설</td>
-                <td>2024.06.12</td>
-                <td>3</td>
-            </tr>
-        </tbody>
+    <%
+    	request.setCharacterEncoding("UTF-8");
+ 		
+		
+		List<Book2DTO> getBookList = null;
+       	boolean isEmptyStr = false;
+       	List<String> db_params = new ArrayList<>();
+       	String targetStr = null;
+       	int targetNo = 0;
+		
+		String booknoSTR = request.getParameter("bookno");
+		String bname = request.getParameter("bname");
+		String bauthor = request.getParameter("bauthor");
+		String bpublish = request.getParameter("bpublish");
+		String gname = request.getParameter("gname");
+		String bcountSTR = request.getParameter("bcount");	
+		
+		String[] params = new String[] {booknoSTR, bname, bauthor, bpublish, gname, bcountSTR};
+		
+		for (String param : params) {           		
+   			if (param != null) {
+   				db_params.add(param);
+   			}
+       	}
+       	
+       	if (db_params.size() != params.length) {
+       		for (String param : db_params) {
+       			if (param.equals("")) {
+       				isEmptyStr = true;
+       				break;
+       			}
+       		}
+       	}
+       	
+       	if (!isEmptyStr) { 
+       		for (int i = 0; i < params.length; i++) {
+       			if (params[i] != null) {
+       				targetStr = params[i];
+       				targetNo = i;
+       				break;
+       			}
+       		}
+       		
+       		if (targetStr != null) {      			
+       			switch (targetNo) {
+       				case 0:
+       					if (booknoSTR.isBlank()) { 
+       	%>					
+       				<script>alert("공백 안됨 다시 입력 Go!");</script>  					       						
+       	<%				
+       					}
+       					else{
+       						int bookno = Integer.parseInt(booknoSTR);
+       						getBookList = bookDAO.getBookNoList(bookno);
+       					}       						
+       	           		break;
+       				case 1:
+       					getBookList = bookDAO.getBookNameList(bname);
+       	           		break;
+       				case 2:
+       					getBookList = bookDAO.getBookAuthorList(bauthor);
+       	           		break;
+       				case 3:
+       					getBookList = bookDAO.getBookPublishList(bpublish);
+       	           		break;
+       				case 4:
+       					getBookList = bookDAO.getBookGnameList(gname);
+       	           		break;
+       				case 5:
+       					if(bcountSTR.isBlank()){
+       	%>				
+       					<script>alert("공백 안됨 다시 입력 Go!");</script>  					
+       	<%			
+       					}else{
+       						int bcount = Integer.parseInt(bcountSTR);
+       						getBookList = bookDAO.getBookCountList(bcount);
+       					}	
+       	           		break;
+       			}           			
+       		}
+       	}
+       	
+       	if (isEmptyStr) {
+       		getBookList = bookDAO.getBookList();
+       	}
+		
+       	if(getBookList != null){
+			for(Book2DTO bookList : getBookList) {
+		%>				
+	             <tr>
+	                <td><%=bookList.getBookno()%></td>
+	                <td><%=bookList.getBname()%></td>
+	                <td><%=bookList.getBauthor()%></td>
+	                <td><%=bookList.getBpublish()%></td>
+	                <td><%=bookList.getBprice()%></td>
+	                <td><%=bookList.getGname()%></td>
+	                <td><%=bookList.getBdate()%></td>
+	                <td><%=bookList.getBcount()%></td>
+	            </tr>       
+		<%	
+		  	}
+		}
+		%>        
+ 	</tbody>
     </table>
-
+    <table id="rankingTable">
+    <div class="section-title">인기 도서</div>
+    	<thead>
+         	<tr>
+	             <th>도서 제목</th>
+	             <th>저자</th>
+	             <th>대여 횟수</th>
+	         </tr>
+	     </thead>
+	     <tbody>
+	     	<%
+				List<Book3DTO> book3List = bookDAO.getBookRanking();
+				for(Book3DTO book : book3List) {	
+			%>
+	     	<tr>
+                <td><%=book.getBname()%></td>
+                <td><%=book.getBauthor()%></td>
+                <td><%=book.getBookno()%></td>
+            </tr>
+            <%
+				}
+			%> 
+	     </tbody>
+    </table>
+    <% 
+    } else {
+    %>
+		<script>
+			alert('로그인을 해주세요');
+			location.href = 'empLogin.jsp';	//
+		</script>
+	 <% 
+    }
+    %>
     <script src="js/script.js"></script>
 
 </body>
