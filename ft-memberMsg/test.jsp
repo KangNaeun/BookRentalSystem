@@ -2,7 +2,7 @@
 <%@ page import="db.dao.MemberInfoDAO"%>
 <%@ page import="db.dto.MsgDTO"%>
 <%@ page import="db.dao.MsgDAO"%>
-<%@ page import="java.util.List"%>
+<%@ page import="java.util.*"%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -23,15 +23,58 @@
 	
 	<button onclick="logout()">로그아웃</button>
 	
-	<button type = 'button' id="btn_msg" onclick="msg()"> 알림메세지 </button>
-	
-	<div class="msg_page">
+	    <div class="select_page">
+      <div class="select_page_body">
+	      <h2> 회원 알림 조회 페이지 </h2>
+	  	  <button type="button" id="btn_close_select_page" onclick="closeSelect()"> X </button>
+  			<div class="section-title"> 메세지 전송 내역</div>
+		 	 <table id="msgTable">
+				<thead>
+					<tr>	
+						<th>회원번호</th>
+						<th>회원명</th>
+						<th>전달한 메세지</th>
+						<th>메세지 전달날짜</th>
+					</tr>
+				</thead>
+				<tbody>
+				<% System.out.println("====="); %>
+					<%
+					request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
 		
-      <div class="msg_page_body">
+					MsgDAO msgDAO = new MsgDAO();
+					List<MsgDTO> msgList = null;
+					
+					msgList = msgDAO.selectMsgAll();
+					//System.out.println(msgList.size());	
+			  		if (msgList != null) {
+			           for (MsgDTO msg : msgList) { %>
+			           	<tr>
+							<td><%=msg.getMembno()%></td>
+			           		<td><%=msg.getMname()%></td>
+			           		<td><%=msg.getMessage()%></td>
+			           		<td><%=msg.getSend_date()%></td>
+			           		
+			           	</tr>
+					<% } 
+			} else {
+				System.out.println("NULL");
+			}
+          	%>
+				</tbody>
+			 </table>
+	  		<button type = 'button' id="btn_msg" onclick="msg()"> 알림메세지전송 </button>
+	  	  </form>
+	
+      </div>
+         
+   </div>
+   
+   <div class="msg_page">
+		<div class="msg_page_body">
 	      <h2> 알림 메세지 전송 페이지 </h2>
 	      <p> 회원번호와 전송할 메세지를 입력하세요.</p>
 	  	  <button type="button" id="btn_close_msg_page" onclick="closeMsg()"> X </button>
-	  	  
 	  	  <form action='msg_action.jsp' method="post" id="frm_msg">
 	  	  		
 	  	  		<p> 회원 번호 </p>
@@ -39,16 +82,15 @@
 		  	  	<p> 회원에게 전달할 메세지 </p>
 		  	  	<p> <input type="text" id="insert_msg" name="insert_msg" placeholder="회원에게 전달할 입력"> </p>
 		 	  <button type = 'submit' id="btn_send" onclick="sendMsg()"> 전송 </button>
-		 	  
 	  	  </form>
 	
-      </div>
-         
+      </div> 
    </div>
 
    <div class="section-title">
     <span>회원 정보</span>
     <button type = 'button' id="btn_add_page" onclick="openAdd()">회원추가</button>
+    <button type = 'button' id="btn_select_page" onclick="openSelect()">회원알림</button>
    </div>
    
    <div class="add_page">
@@ -59,8 +101,6 @@
 	  	  <button type="button" id="btn_close_add_page" onclick="closeAdd()"> X </button>
 	  	  
 	  	  <form action='add_action.jsp' method="post" id="frm_add">
-	  	  
-	  	  		
 	  	  		<p> 회원 이름 </p>
 		  	  	<p> <input type="text" id="insert_mname" name="insert_mname" placeholder="회원이름 입력"> </p>
 		  	  	<p> 회원 주소 </p>
@@ -73,9 +113,7 @@
       </div>
          
    </div>
-   
-   
-
+ 
 	<div class="search-box">
 		<div class="search-group">
 			<form action='test.jsp' method="post" id="frm_membno">
@@ -129,7 +167,7 @@
 			String mphone = request.getParameter("mphone");
 			String mstatus = request.getParameter("mstatus");
 
-		
+		//
 			if (request.getParameter("membno") != null && request.getParameter("membno") != "") {
 				int membno = Integer.parseInt(request.getParameter("membno"));
 				//memberList = select(membno); 함수추가
@@ -230,27 +268,6 @@
 		</tbody>
 	</table>
 	
-<!-- +) 메세지 전송 내역 -->
-	<div class="section-title"> 메세지 전송 내역</div>
-		 	 <table id="msgTable">
-				<thead>
-					<tr>
-						<th>회원번호</th>
-						<th>회원명</th>
-						<th>전달한 메세지</th>
-						<th>메세지 전달날짜</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>100</td>
-						<td>강나은</td>
-						<td>대여가 불가능합니다.</td>
-						<td>2024.06.22</td>
-					</tr>
-				</tbody>
-			</table>
-	
 	
 	<!-- 10001	100	1001	24/06/21	od -->
 	<div class="section-title">대여 현황 조회</div>
@@ -274,48 +291,31 @@
 	</div>
 	<table id="bookTable">
 		<thead>
-			<tr>
-				<th>대여번호</th>
-				<th>회원명</th>
-				<th>도서제목</th>
-				<th>대여날짜</th>
-				<th>반납기한</th>
-				<th>대여상태</th>
-			</tr>
-		</thead>
-		<tbody>
-			<%
-			request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
-
-			MsgDAO msgDAO = new MsgDAO();
-			List<MsgDTO> msgList = null;
-
-			String membno = request.getParameter("membno");
-		
-			String mname2 = request.getParameter("mname");
-
-			String message = request.getParameter("message");
-			
-			String send_date = request.getParameter("send_date");
-			
-
-			
-			if (msgList != null) {
-			%>
-			<%
-				for (MsgDTO msg : msgList) {
-				%>
-				<tr>
-					<td><%=msg.getMembno()%></td>
-					<%-- <td><%=msg.getMname()%></td> --%>
-					<td><%=msg.getMessage()%></td>
-					<td><%=msg.getSend_date()%></td>
-				</tr>
-				<%
-				}
-			}
-			%>
-		</tbody>
+            <tr>
+                <th>대여번호</th>
+                <th>회원명</th>
+                <th>도서제목</th>
+                <th>대여날짜</th> 
+                <th>반납기한</th>      
+                <th>연체날짜</th>  
+                <th>정지날짜</th>  
+                <th>반납날짜</th>           
+                <th>대여상태</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10000</td>
+                <td>강지은</td>
+                <td>아이가 없는 집</td>
+                <td>2024.06.22</td>     
+                <td>2024.06.29</td>  
+                <td></td>    
+                <td></td>    
+                <td></td>    
+                <td>대여중</td>
+            </tr>
+        </tbody>
 	</table>
 
 <!-- 도서 추가페이지 -->	

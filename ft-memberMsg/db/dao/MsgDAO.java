@@ -26,7 +26,7 @@ public class MsgDAO {
 			conn = DBConnectionManager.connectDB();
 
 			String query = " INSERT INTO member_message "
-					+ " VALUES ( ? , ? , SYSDATE) ";
+					+ " VALUES ( (SELECT NVL(MAX(msgno), 1000000) FROM member_message )+1, ? , ? , SYSDATE) ";
 
 			psmt = conn.prepareStatement(query);
 			
@@ -46,18 +46,19 @@ public class MsgDAO {
 		return result;
 
 	}
+	
 
 // 알림메세지 모든 내역 조회
-	public List<MsgDTO> selectMemberInfoAll() {
+	public List<MsgDTO> selectMsgAll() {
 
 		List<MsgDTO> msgList = null;
 
 		try {
 			conn = DBConnectionManager.connectDB();
 
-			String query = "select mms.membno, m.mname, mms.message, mms.send_date "
-					+ "from member_message mms, memberInfo "
-					+ "where m.membno = mms.membno ";
+			String query = " select mms.membno, m.mname, mms.message, TO_CHAR(mms.send_date, 'YYYY-MM-DD HH24:MI:SS') send_date "
+					+ " from member_message mms, memberInfo m "
+					+ " where m.membno = mms.membno ";
 
 			psmt = conn.prepareStatement(query);
 
@@ -68,12 +69,12 @@ public class MsgDAO {
 			while (rs.next()) { // 더이상 가져올 데이터가 없을때까지~
 
 				MsgDTO msg = new MsgDTO();
-				// member.setMembno(rs.getInt("membno"));
 				
 				msg.setMembno(rs.getInt("membno"));
+				msg.setMname(rs.getString("mname"));				
 				msg.setMessage(rs.getString("message"));
-				
-
+				msg.setSend_date(rs.getString("send_date"));
+			
 				msgList.add(msg);
 			}
 
