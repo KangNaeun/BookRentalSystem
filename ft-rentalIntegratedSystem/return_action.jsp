@@ -24,7 +24,7 @@
 	ReturnDTO returnDTO = new ReturnDTO(returnNoInt);
 	ReturnDAO returnDAO = new ReturnDAO();
 	
-	//대여번호로 대여테이블에서 책을 'cp'상태로 update하고 comp_date를 syadate로 수정 
+	//대여번호로 대여테이블에서 책을 'cp'상태로 update하고 comp_date를 sysdate로 수정 
 	int returnUpdate = returnDAO.returnBookAtRentalTable(returnDTO.getRentno());
 	
 	//'cp' 상태로 update가 잘 되었으면
@@ -45,10 +45,9 @@
 		//위에서 얻은 회원번호로 해당 회원의 미반납 수량조회
 		int countRental = returnDAO.countMemberRentalHistory(returnDTO.getMembno());
 		
-		//해당 회원이 더 이상 빌린 책이 없다면
-		if(countRental == 0){
+		//해당 회원이 더 이상 빌린 책이 없다면 + 정지회원이 아니면(memberinfo 기준)
+		if( countRental == 0 && !( returnDAO.selectMemberStatus(returnDTO.getMembno()).equals("st") ) ){	//
 			//회원이 빌린 모든 책이 반납 완료면, 'nrt'로 회원 상태 변경
-			//정지 회원이 아닌경우에만!!!!!!!(조건 추가, 아직구현X)***********
 			int updateStatus = returnDAO.updateMemberStatusToNRT(returnDTO.getMembno());
 			
 			//'nrt'로 회원 상태 update가 잘되었으면
@@ -58,10 +57,13 @@
 				</script>
 		<%	}
 			
-		} else {//반납한 책이 남아있으면 + 연체된 책이 있으면 연체 // 책 남아있고 + 그냥 반납상태면 대여중상태로 전환
+		} else if(countRental == 0 && returnDAO.selectMemberStatus(returnDTO.getMembno()).equals("st") ){ //반납할 책이 없고 정지회원
 			
-			//연체 회원이 빌린 책들 중에 연체된 책이 있는지 조사
+		} else {//반납할 책이 남아있으면 + 연체된 책이 있으면 -> 연체 // 책 남아있고 + 그냥 반납상태면 대여중상태로 전환
+			
+			//연체(+ 정지) 미납 책 수량 조사
 			int overdueCount = returnDAO.searchOverdueBookCount(returnDTO.getMembno());
+			
 			
 			if(overdueCount == 0){ //연체상태인데 연체된 책이 더 이상 없으면 회원 상태를'rt'로 상태전환
 				int updateToRT =returnDAO.updateMemberStatusToRT(returnDTO.getMembno());
@@ -76,20 +78,20 @@
 							alert("연체 상태인 회원입니다.");
 						</script>
 				<%}
-			}
+			} else { %> <!-- 이 부분을 추가 -->
 			
-			%>
+				<script>
+					alert("아직 반납해야 할 책이 남았습니다.");
+				</script>
+			<%} %> <!-- 이 부분을 추가 -->
 			
-			<script>
-				alert("아직 반납해야 할 책이 남았습니다.");
-			</script>
-	<%}
-	} else{ //'cp' 상태로 update가 안되면(로직 오류로 반납 실패) %> 
-		<script>
-			alert("반납처리 실패");
-		</script>
-	<%}
-	%>
+	<%} //반납 처리 끝 %>
+	
+<% } else { //'cp' 상태로 update가 안되면(로직 오류로 반납 실패) %> 
+	<script>
+		alert("반납처리 실패");
+	</script>
+<% } %>
 	
 </body>
 </html>
