@@ -12,6 +12,37 @@ public class ReturnDAO {
 	PreparedStatement psmt = null;
 	ResultSet rs = null;
 	
+	//회원번호로 대여상태 조사
+	public String selectMemberStatus(int membno) {
+		
+		String mstatus = null;
+		
+		try {
+
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select mststus_id from memberinfo where membno = ? ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setInt(1, membno);
+
+			rs = psmt.executeQuery();
+
+			if (rs.next()) {
+				mstatus = rs.getString("mststus_id");
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return mstatus;
+	}
+	
+	
+	
 	//반납을 위해 회원번호로 멤버의 대여상태를 rt로 update
 	public int updateMemberStatusToRT(int membno){
 		int updateResult = 0;
@@ -47,7 +78,7 @@ public class ReturnDAO {
 
 			String query = " select count(*) 연체된책수량 "
 					+ " from rental "
-					+ " where membno = ? and rstatus_id = 'od' ";
+					+ " where membno = ? and ( rstatus_id = 'od' or rstatus_id = 'st' ) ";
 
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, membno);

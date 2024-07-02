@@ -3,9 +3,6 @@ package db.dto;
 public class RentalDTO {
 	int membno; // 멤버번호
 	int bookno; // 책번호
-	
-	
-	///////////////////////////////////
 	int rentalno; // 회원대여번호
 	String mname; // 회원이름
 	String bookName; // 책이름
@@ -17,6 +14,42 @@ public class RentalDTO {
 	String stDate; // 정지날짜
 	String coDate; // 반납날짜
 	String rStatus; // 반납상태
+	
+	
+	
+	
+	
+	public RentalDTO(int rentalno, String mname, String bookName, String odDate, String stDate) {
+		this.rentalno = rentalno;
+		this.mname = mname;
+		this.bookName = bookName;
+		this.odDate = odDate;
+		this.stDate = stDate;
+	}
+
+	public RentalDTO(int rentalno, String mname, String bookName, String rDate, String rtDate, String odDate,
+			String rStatus) {
+		this.rentalno = rentalno;
+		this.mname = mname;
+		this.bookName = bookName;
+		this.rDate = rDate;
+		this.rtDate = rtDate;
+		this.odDate = odDate;
+		this.rStatus = rStatus;
+	}
+
+	public RentalDTO(int rentalno, String mname, String bookName, String rDate, String rtDate, String rStatus) {
+		this.rentalno = rentalno;
+		this.mname = mname;
+		this.bookName = bookName;
+		
+		this.rDate = rDate;
+		this.rtDate = rtDate;
+		this.rStatus = rStatus;
+	}
+
+	///////////////////////////////////
+	
 	
 	
 	public RentalDTO(int rentalno, String mname, String bookName, String rDate, String rtDate, String odDate,
@@ -45,6 +78,8 @@ public class RentalDTO {
 		this.membno = membno;
 		this.bookno = bookno;
 	}
+	
+	
 
 	// getter & setter
 	

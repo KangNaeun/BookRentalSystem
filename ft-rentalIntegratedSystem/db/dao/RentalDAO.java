@@ -15,175 +15,508 @@ public class RentalDAO {
 	PreparedStatement psmt = null;
 	ResultSet rs = null;
 	
+	//정지 상태를 해제
+	public int convertStatusToNrtFromMemberInfo(int membno) {
+		int convertResult = 0;
+
+		try {
+
+			conn = DBConnectionManager.connectDB();
+
+			String query = " UPDATE memberinfo "
+					+ "SET mstatus_id = 'nrt' "
+					+ "WHERE membno = ?  ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setInt(1, membno);
+			
+
+			convertResult = psmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return convertResult;
+	}
 	
-	//휴대폰 번호로 회원의 대여내역 조회
-		public List<RentalDTO> selectRentalMemberByPhone(String memberPhone) {
+	//정지 상태를 해제할 수 있는 회원 조회
+	public List<RentalDTO> selectStopCancelMember(){
+		RentalDTO rentalMember = null;
+		List<RentalDTO> rentalList = null;
 
-			RentalDTO rentalMember = null;
-			List<RentalDTO> rentalList = null;
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select r.rentno 대여번호, m.mname 회원이름, b.bname 도서제목, TO_CHAR(r.od_date, 'YY/MM/DD') 연체날짜, TO_CHAR(r.stop_date, 'YY/MM/DD') 정지날짜, TO_CHAR(r.comp_date, 'YY/MM/DD') 반납날짜 "
+					+ " from rental r, memberinfo m, book b "
+					+ " where r.comp_date +7 < SYSDATE "
+					+ " and r.bookno = b.bookno "
+					+ " and r.membno = m.membno "
+					+ " and r.stop_date is not null "
+					+ " and r.comp_date is not null "
+					+ " and m.mstatus_id = 'st' ";
+
+			psmt = conn.prepareStatement(query);
+
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				if(rentalMember == null){
+					rentalMember = new RentalDTO();
+				}
+				if (rentalList == null) {
+					rentalList = new ArrayList<RentalDTO>();
+				}
+
+				int rsRno = rs.getInt("대여번호");
+				String rsMname = rs.getString("회원이름");
+				String rsBname = rs.getString("도서제목");
+				
+				String rsOddate = rs.getString("연체날짜");
+				String rsStdate = rs.getString("정지날짜");
+				String rsCodate = rs.getString("반납날짜");
+				
+				
+				rentalMember.setRentalno(rsRno);
+				rentalMember.setMname(rsMname);
+				rentalMember.setBookName(rsBname);
+				
+				rentalMember.setOdDate(rsOddate);
+				rentalMember.setStDate(rsStdate);
+				rentalMember.setCoDate(rsCodate);
+				
+
+				rentalList.add(rentalMember);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return rentalList;
+	}
+	
+	//대여 테이블에서 정지 날짜 update
+		public int updateStopDateFromRental(int rentno) {
+			int convertResult = 0;
 
 			try {
+
 				conn = DBConnectionManager.connectDB();
 
-				String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, "
-						+ " TO_CHAR(r.rental_date) 대여날짜, TO_CHAR(r.return_date) 반납기한, TO_CHAR(r.od_date) 연체날짜, TO_CHAR(r.stop_date) 정지날짜, TO_CHAR(r.comp_date) 반납날짜, rs.rstatus 대여상태 "
-						+ " from rental r, memberinfo m, book b, rental_status rs "
-						+ " where m.mphone= ? and m.membno = r.membno and b.bookno = r.bookno and r.rstatus_id = rs.rstatus_id ";
+				String query = " UPDATE rental "
+						+ "SET stop_date = SYSDATE, rstatus_id = 'st' "
+						+ "WHERE rentno = ? ";
 
 				psmt = conn.prepareStatement(query);
-				psmt.setString(1, memberPhone);
+				psmt.setInt(1, rentno);
+				
 
-				rs = psmt.executeQuery();
+				convertResult = psmt.executeUpdate();
 
-				while (rs.next()) {
-					if (rentalList == null) {
-						rentalList = new ArrayList<RentalDTO>();
-					}
-
-					int rsRno = rs.getInt("대여번호");
-					String rsMname = rs.getString("회원명");
-					String rsBname = rs.getString("도서제목");
-
-					String rsRdate = rs.getString("대여날짜");
-					String rsRedate = rs.getString("반납기한");
-					String rsOdate = rs.getString("연체날짜");
-
-					String rsSdate = rs.getString("정지날짜");
-					String rsCdate = rs.getString("반납날짜");
-					String rsRstatus = rs.getString("대여상태");
-
-					rentalMember = new RentalDTO(rsRno, rsMname, rsBname, rsRdate, rsRedate, rsOdate, rsSdate, rsCdate,
-							rsRstatus);
-					rentalList.add(rentalMember);
-
-				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
 				DBConnectionManager.disconnectDB(conn, psmt, rs);
 			}
 
-			return rentalList;
+			return convertResult;
+		}
+	
+	//회원정보 테이블에서 정지처리
+	public int convertStatusToStopFromMemberInfo(int rentno) {
+		int convertResult = 0;
+
+		try {
+
+			conn = DBConnectionManager.connectDB();
+
+			String query = " UPDATE memberinfo "
+					+ " SET mstatus_id = 'st' "
+					+ " WHERE membno = ( select membno from rental where rentno = ? ) ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setInt(1, rentno);
+			
+
+			convertResult = psmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return convertResult;
+	}
+	
+	
+	//정지 현황 조회
+	public List<RentalDTO> selectStopMember() {
+
+		RentalDTO rentalMember = null;
+		List<RentalDTO> rentalList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select r.rentno 대여번호, m.mname 회원이름, b.bname 도서제목, "
+					+ " TO_CHAR(r.rental_date, 'YY/MM/DD') 대여날짜, TO_CHAR(r.return_date, 'YY/MM/DD') 반납기한, TO_CHAR(r.od_date, 'YY/MM/DD') 연체날짜, rs.rstatus 대여상태 "
+					+ " from rental r, memberinfo m, book b, rental_status rs "
+					+ " where r.membno = m.membno "
+					+ " and r.rstatus_id = rs.rstatus_id "
+					+ " and r.bookno = b.bookno "
+					+ " and od_date is not null "
+					+ " and od_date +7 < SYSDATE "
+					+ " and m.mstatus_id != 'st' ";
+
+			psmt = conn.prepareStatement(query);
+
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				if (rentalList == null) {
+					rentalList = new ArrayList<RentalDTO>();
+				}
+
+				int rsRno = rs.getInt("대여번호");
+				String rsMname = rs.getString("회원이름");
+				String rsBname = rs.getString("도서제목");
+				
+				String rsRdate = rs.getString("대여날짜");
+				String rsRedate = rs.getString("반납기한");
+				String rsOddate = rs.getString("연체날짜");
+				String rsRstatus = rs.getString("대여상태");
+
+				rentalMember = new RentalDTO(rsRno, rsMname, rsBname,
+						rsRdate, rsRedate, rsOddate, rsRstatus);
+				rentalList.add(rentalMember);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return rentalList;
+	}
+	
+	
+	
+	
+	
+	//회원 테이블에서 연체 처리
+		public int convertStatusToOverdueFromMemberInfo(int membno) {
+			int convertResult = 0;
+
+			try {
+
+				conn = DBConnectionManager.connectDB();
+
+				String query = " UPDATE memberinfo "
+						+ " SET mstatus_id = 'od' "
+						+ " WHERE membno = ? ";
+
+				psmt = conn.prepareStatement(query);
+				psmt.setInt(1, membno);
+				
+
+				convertResult = psmt.executeUpdate();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				DBConnectionManager.disconnectDB(conn, psmt, rs);
+			}
+
+			return convertResult;
 		}
 		
-		//이름으로 회원의 대여내역 조회
-		public List<RentalDTO> selectRentalMemberByName(String memberName) {
-
-			RentalDTO rentalMember = null;
-			List<RentalDTO> rentalList = null;
-
-			try {
-				conn = DBConnectionManager.connectDB();
-
-				String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, "
-						+ " TO_CHAR(r.rental_date) 대여날짜, TO_CHAR(r.return_date) 반납기한, TO_CHAR(r.od_date) 연체날짜, TO_CHAR(r.stop_date) 정지날짜, TO_CHAR(r.comp_date) 반납날짜, rs.rstatus 대여상태 "
-						+ " from rental r, memberinfo m, book b, rental_status rs "
-						+ " where m.mname= ? and m.membno = r.membno and b.bookno = r.bookno and r.rstatus_id = rs.rstatus_id ";
-
-				psmt = conn.prepareStatement(query);
-				psmt.setString(1, memberName);
-
-				rs = psmt.executeQuery();
-
-				while (rs.next()) {
-					if (rentalList == null) {
-						rentalList = new ArrayList<RentalDTO>();
-					}
-
-					int rsRno = rs.getInt("대여번호");
-					String rsMname = rs.getString("회원명");
-					String rsBname = rs.getString("도서제목");
-
-					String rsRdate = rs.getString("대여날짜");
-					String rsRedate = rs.getString("반납기한");
-					String rsOdate = rs.getString("연체날짜");
-
-					String rsSdate = rs.getString("정지날짜");
-					String rsCdate = rs.getString("반납날짜");
-					String rsRstatus = rs.getString("대여상태");
-
-					rentalMember = new RentalDTO(rsRno, rsMname, rsBname, rsRdate, rsRedate, rsOdate, rsSdate, rsCdate,
-							rsRstatus);
-					rentalList.add(rentalMember);
-
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				DBConnectionManager.disconnectDB(conn, psmt, rs);
-			}
-
-			return rentalList;
-		}
 		
-		//회원 번호로 대여내역 조회
-		public List<RentalDTO> selectRentalMemberByNo(int memberNo) {
-
-			RentalDTO rentalMember = null;
-			List<RentalDTO> rentalList = null;
-
+	//대여 테이블에서 회원 번호 가져오기
+		public int findMembnoFromRental(int rentno) {
+			
+			int membno = 0;
 			try {
+
 				conn = DBConnectionManager.connectDB();
 
-				String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, "
-						+ " TO_CHAR(r.rental_date) 대여날짜, TO_CHAR(r.return_date) 반납기한, TO_CHAR(r.od_date) 연체날짜, TO_CHAR(r.stop_date) 정지날짜, TO_CHAR(r.comp_date) 반납날짜, rs.rstatus 대여상태 "
-						+ " from rental r, memberinfo m, book b, rental_status rs "
-						+ " where m.membno= ? and m.membno = r.membno and b.bookno = r.bookno and r.rstatus_id = rs.rstatus_id ";
+				String query = " select membno from rental where rentno = ? ";
 
 				psmt = conn.prepareStatement(query);
-				psmt.setInt(1, memberNo);
+				psmt.setInt(1, rentno);
+				
 
 				rs = psmt.executeQuery();
-
-				while (rs.next()) {
-					if (rentalList == null) {
-						rentalList = new ArrayList<RentalDTO>();
-					}
-
-					int rsRno = rs.getInt("대여번호");
-					String rsMname = rs.getString("회원명");
-					String rsBname = rs.getString("도서제목");
-
-					String rsRdate = rs.getString("대여날짜");
-					String rsRedate = rs.getString("반납기한");
-					String rsOdate = rs.getString("연체날짜");
-
-					String rsSdate = rs.getString("정지날짜");
-					String rsCdate = rs.getString("반납날짜");
-					String rsRstatus = rs.getString("대여상태");
-
-					rentalMember = new RentalDTO(rsRno, rsMname, rsBname, rsRdate, rsRedate, rsOdate, rsSdate, rsCdate,
-							rsRstatus);
-					rentalList.add(rentalMember);
-
+				
+				if(rs.next()) {
+					membno = rs.getInt("membno");
 				}
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} finally {
 				DBConnectionManager.disconnectDB(conn, psmt, rs);
 			}
 
-			return rentalList;
+			return membno;
+		}
+	
+	
+	
+	
+	//대여 테이블에서 연체 처리
+	public int convertStatusToOverdue(int rentno) {
+		int overdueResult = 0;
+
+		try {
+
+			conn = DBConnectionManager.connectDB();
+
+			String query = " UPDATE rental "
+					+ " SET rstatus_id = 'od', od_date = SYSDATE"
+					+ " WHERE rentno = ? ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setInt(1, rentno);
+			
+
+			overdueResult = psmt.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
 		}
 
-	//회원번호, 책번호로 대여 내역에 insert
+		return overdueResult;
+	}
+	
+	//연체 현황 조회
+	public List<RentalDTO> selectOverdueMember() {
+
+		RentalDTO rentalMember = null;
+		List<RentalDTO> rentalList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, TO_CHAR(r.rental_date, 'YY/MM/DD') 대여날짜, TO_CHAR(r.return_date, 'YY/MM/DD') 반납기한, r.rstatus_id 대여상태 "
+					+ " from rental r, memberinfo m, book b "
+					+ "where r.membno = m.membno and r.bookno = b.bookno and return_date < sysdate and rstatus_id != 'cp' and od_date IS NULL ";
+
+			psmt = conn.prepareStatement(query);
+
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				if (rentalList == null) {
+					rentalList = new ArrayList<RentalDTO>();
+				}
+
+				int rsRno = rs.getInt("대여번호");
+				String rsMname = rs.getString("회원명");
+				String rsBname = rs.getString("도서제목");
+				
+				String rsRdate = rs.getString("대여날짜");
+				String rsRedate = rs.getString("반납기한");
+				String rsRstatus = rs.getString("대여상태");
+
+				rentalMember = new RentalDTO(rsRno, rsMname, rsBname,
+						rsRdate, rsRedate, rsRstatus);
+				rentalList.add(rentalMember);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return rentalList;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// 휴대폰 번호로 회원의 대여내역 조회
+	public List<RentalDTO> selectRentalMemberByPhone(String memberPhone) {
+
+		RentalDTO rentalMember = null;
+		List<RentalDTO> rentalList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, "
+					+ " TO_CHAR(r.rental_date) 대여날짜, TO_CHAR(r.return_date) 반납기한, TO_CHAR(r.od_date) 연체날짜, TO_CHAR(r.stop_date) 정지날짜, TO_CHAR(r.comp_date) 반납날짜, rs.rstatus 대여상태 "
+					+ " from rental r, memberinfo m, book b, rental_status rs "
+					+ " where m.mphone= ? and m.membno = r.membno and b.bookno = r.bookno and r.rstatus_id = rs.rstatus_id ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setString(1, memberPhone);
+
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				if (rentalList == null) {
+					rentalList = new ArrayList<RentalDTO>();
+				}
+
+				int rsRno = rs.getInt("대여번호");
+				String rsMname = rs.getString("회원명");
+				String rsBname = rs.getString("도서제목");
+
+				String rsRdate = rs.getString("대여날짜");
+				String rsRedate = rs.getString("반납기한");
+				String rsOdate = rs.getString("연체날짜");
+
+				String rsSdate = rs.getString("정지날짜");
+				String rsCdate = rs.getString("반납날짜");
+				String rsRstatus = rs.getString("대여상태");
+
+				rentalMember = new RentalDTO(rsRno, rsMname, rsBname, rsRdate, rsRedate, rsOdate, rsSdate, rsCdate,
+						rsRstatus);
+				rentalList.add(rentalMember);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return rentalList;
+	}
+
+	// 이름으로 회원의 대여내역 조회
+	public List<RentalDTO> selectRentalMemberByName(String memberName) {
+
+		RentalDTO rentalMember = null;
+		List<RentalDTO> rentalList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, "
+					+ " TO_CHAR(r.rental_date) 대여날짜, TO_CHAR(r.return_date) 반납기한, TO_CHAR(r.od_date) 연체날짜, TO_CHAR(r.stop_date) 정지날짜, TO_CHAR(r.comp_date) 반납날짜, rs.rstatus 대여상태 "
+					+ " from rental r, memberinfo m, book b, rental_status rs "
+					+ " where m.mname= ? and m.membno = r.membno and b.bookno = r.bookno and r.rstatus_id = rs.rstatus_id ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setString(1, memberName);
+
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				if (rentalList == null) {
+					rentalList = new ArrayList<RentalDTO>();
+				}
+
+				int rsRno = rs.getInt("대여번호");
+				String rsMname = rs.getString("회원명");
+				String rsBname = rs.getString("도서제목");
+
+				String rsRdate = rs.getString("대여날짜");
+				String rsRedate = rs.getString("반납기한");
+				String rsOdate = rs.getString("연체날짜");
+
+				String rsSdate = rs.getString("정지날짜");
+				String rsCdate = rs.getString("반납날짜");
+				String rsRstatus = rs.getString("대여상태");
+
+				rentalMember = new RentalDTO(rsRno, rsMname, rsBname, rsRdate, rsRedate, rsOdate, rsSdate, rsCdate,
+						rsRstatus);
+				rentalList.add(rentalMember);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return rentalList;
+	}
+
+	// 회원 번호로 대여내역 조회
+	public List<RentalDTO> selectRentalMemberByNo(int memberNo) {
+
+		RentalDTO rentalMember = null;
+		List<RentalDTO> rentalList = null;
+
+		try {
+			conn = DBConnectionManager.connectDB();
+
+			String query = " select r.rentno 대여번호, m.mname 회원명, b.bname 도서제목, "
+					+ " TO_CHAR(r.rental_date) 대여날짜, TO_CHAR(r.return_date) 반납기한, TO_CHAR(r.od_date) 연체날짜, TO_CHAR(r.stop_date) 정지날짜, TO_CHAR(r.comp_date) 반납날짜, rs.rstatus 대여상태 "
+					+ " from rental r, memberinfo m, book b, rental_status rs "
+					+ " where m.membno= ? and m.membno = r.membno and b.bookno = r.bookno and r.rstatus_id = rs.rstatus_id ";
+
+			psmt = conn.prepareStatement(query);
+			psmt.setInt(1, memberNo);
+
+			rs = psmt.executeQuery();
+
+			while (rs.next()) {
+				if (rentalList == null) {
+					rentalList = new ArrayList<RentalDTO>();
+				}
+
+				int rsRno = rs.getInt("대여번호");
+				String rsMname = rs.getString("회원명");
+				String rsBname = rs.getString("도서제목");
+
+				String rsRdate = rs.getString("대여날짜");
+				String rsRedate = rs.getString("반납기한");
+				String rsOdate = rs.getString("연체날짜");
+
+				String rsSdate = rs.getString("정지날짜");
+				String rsCdate = rs.getString("반납날짜");
+				String rsRstatus = rs.getString("대여상태");
+
+				rentalMember = new RentalDTO(rsRno, rsMname, rsBname, rsRdate, rsRedate, rsOdate, rsSdate, rsCdate,
+						rsRstatus);
+				rentalList.add(rentalMember);
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConnectionManager.disconnectDB(conn, psmt, rs);
+		}
+
+		return rentalList;
+	}
+
+	// 회원번호, 책번호로 대여 내역에 insert
 	public int insertRentalHistory(int membno, int bookno) {
 		int insertCount = 0;
-		
+
 		try {
 
 			conn = DBConnectionManager.connectDB();
 
 			String query = " INSERT INTO rental(RENTNO, MEMBNO, BOOKNO, RENTAL_DATE, RETURN_DATE, RSTATUS_ID) "
 					+ " VALUES( (select max(rentno)+1 from rental), ?, ?, sysdate, sysdate+7, 'rt') ";
-			
+
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, membno);
 			psmt.setInt(2, bookno);
 
 			insertCount = psmt.executeUpdate();
-
-			
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -193,11 +526,11 @@ public class RentalDAO {
 
 		return insertCount;
 	}
-	
-	//책을 빌리면 회원 대여상태를 'rt'로 전환
+
+	// 책을 빌리면 회원 대여상태를 'rt'로 전환
 	public int updateRentalMemberStatus(int membno) {
 		int rsUpdateStatus = 0;
-		
+
 		try {
 
 			conn = DBConnectionManager.connectDB();
@@ -209,7 +542,6 @@ public class RentalDAO {
 
 			rsUpdateStatus = psmt.executeUpdate();
 
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -218,11 +550,11 @@ public class RentalDAO {
 
 		return rsUpdateStatus;
 	}
-	
-	//책이 대여 가능한지 알아보기 위해, 대여테이블에서 빌려진 책의 수량 조회
+
+	// 책이 대여 가능한지 알아보기 위해, 대여테이블에서 빌려진 책의 수량 조회
 	public int searchRentedBookCount(int bookno) {
 		int rsBookCount = 0;
-		
+
 		try {
 
 			conn = DBConnectionManager.connectDB();
@@ -246,8 +578,8 @@ public class RentalDAO {
 
 		return rsBookCount;
 	}
-	
-	//대여테이블에서 회원번호로 해당 회원의 대여이력 건수를 조회
+
+	// 대여테이블에서 회원번호로 해당 회원의 대여이력 건수를 조회
 	public int searchMemberHistoryCount(int membno) {
 		int rsBookCount = 0;
 		try {
@@ -273,8 +605,8 @@ public class RentalDAO {
 
 		return rsBookCount;
 	}
-	
-	//책 번호로 우리가 보유한 책의 수량을 조사
+
+	// 책 번호로 우리가 보유한 책의 수량을 조사
 	public int searchBookCount(int bookno) {
 		int rsBookCount = 0;
 		try {
@@ -300,12 +632,12 @@ public class RentalDAO {
 
 		return rsBookCount;
 	}
-	
-	//회원 대여상태 변환을 위해 회원정보 테이블에서 회원 대여상태 조회
+
+	// 회원 대여상태 변환을 위해 회원정보 테이블에서 회원 대여상태 조회
 	public String searchMemberStatus(int membno) {
-		
+
 		String rsMembStatus = null;
-		
+
 		try {
 
 			conn = DBConnectionManager.connectDB();

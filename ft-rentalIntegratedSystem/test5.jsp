@@ -189,14 +189,15 @@
 	<div class="section-title">
 		<span>대여 현황 조회</span>
 		<button onclick="openOverdueList()">연체 현황 조회</button>
-		<button onclick="">대여 현황 조회</button>
+		<button onclick="openStopList()">정지 현황 조회</button>
+		<button onclick="openStopCancelList()">정지 해제 가능 회원 조회</button>
 	</div>
 	
 	<div class="overdue-modal">
 	
 		<div class="overdue-modal-body">
 			<h2>연체 현황 조회</h2>
-			<button id="" onclick="">닫기</button>
+			<button onclick="closeOverdueList()">닫기</button>
          
         
 		<div class="overdue-modal-content">
@@ -210,6 +211,7 @@
 						<th>대여날짜</th>
 						<th>반납기한</th>
 						<th>대여상태</th>
+						<th>연체전환</th>
 					</tr>
 				</thead>
 		
@@ -217,30 +219,156 @@
 				<%
 					//td가 6개
 					//tr이 행, td가 열
+					RentalDAO rentalDAO2 = new RentalDAO();
+					List<RentalDTO> overdueMemberList = rentalDAO2.selectOverdueMember();
+					for(int i=0; i<overdueMemberList.size(); i++){
+					
 				%>
 					<tr>
-						<td id="" ><%=123%></td>
-						<td id="" ><%=123%></td>
-						<td><%=123%></td>
-		
-						<td><%=123%></td>
-						<td><%=123%></td>
-						<td><%=123%></td>
+						<td id="od-rental-no<%=i%>" ><%=overdueMemberList.get(i).getRentalno()%></td>
+						<td><%=overdueMemberList.get(i).getMname()%></td>
+						<td><%=overdueMemberList.get(i).getBookName()%></td>
+						<td><%=overdueMemberList.get(i).getrDate()%></td>
+						<td><%=overdueMemberList.get(i).getRtDate()%></td>
+						<td><%=overdueMemberList.get(i).getrStatus().equals("od") ? "연체" : ""%></td>
 						
-		
+						<td><button id="od-btn<%=i%>" onclick="convertToOverdue(<%=i%>)"> 연체전환 </button></td>
+						
 						<!-- 연체 현황 조회를 위한 form과 hidden된 input창 (아직 구현X) -->
-						<form action="return_action.jsp" method="POST" id="frm-return">
-							<input type="hidden" id="" name="">
-							<input type="hidden" id="" name="">
+						<form action="overdue_action.jsp" method="POST" id="frm-overdue">
+							<input type="hidden" id="input-od-rentno" name="OdRentalhiddenId">
 						</form>
 						
 					</tr>
+					<%}%>
 			</tbody>
 		</table>
 			
 		</div> <!-- overdue-modal-content 끝 -->
 		</div> <!-- overdue-modal-body 끝 -->
 	</div> <!-- overdue-modal 끝 -->
+	
+	
+	
+	<div class="stop-modal">
+	
+		<div class="stop-modal-body">
+			<h2>정지 현황 조회</h2>
+			<button onclick="closeStopList()">닫기</button>
+         
+        
+		<div class="stop-modal-content">
+			
+			<table id="historyTable">
+				<thead>
+					<tr>
+						<th>대여번호</th>
+						<th>회원명</th>
+						<th>도서제목</th>
+						
+						<th>대여날짜</th>
+						<th>반납기한</th>
+						<th>연체날짜</th>
+						<th>대여상태</th>
+						<th>정지전환</th>
+					</tr>
+				</thead>
+		
+				<tbody>
+				<%
+					//td가 6개
+					//tr이 행, td가 열
+					RentalDAO rentalDAO3 = new RentalDAO();
+					List<RentalDTO> stopMemberList = rentalDAO2.selectStopMember();
+					if(stopMemberList != null){
+					for(int i=0; i<stopMemberList.size(); i++){
+					
+				%>
+					<tr>
+						<td id="st-rental-no<%=i%>" ><%=stopMemberList.get(i).getRentalno()%></td>
+						<td><%=stopMemberList.get(i).getMname()%></td>
+						<td><%=stopMemberList.get(i).getBookName()%></td>
+						<td><%=stopMemberList.get(i).getrDate()%></td>
+						<td><%=stopMemberList.get(i).getRtDate()%></td>
+						<td><%=stopMemberList.get(i).getOdDate()%></td>
+						<td><%=stopMemberList.get(i).getrStatus()%></td>
+						
+						<td><button id="st-btn<%=i%>" onclick="convertToStop(<%=i%>)"> 정지전환 </button></td>
+						
+						<!-- 연체 현황 조회를 위한 form과 hidden된 input창 (아직 구현X) -->
+						<form action="stop_action.jsp" method="POST" id="frm-stop">
+							<input type="hidden" id="input-st-rentno" name="StRentalhiddenId">
+						</form>
+						
+					</tr>
+					<%}}%>
+			</tbody>
+		</table>
+			
+		</div> <!-- stop-modal-content 끝 -->
+		</div> <!-- stop-modal-body 끝 -->
+	</div> <!-- stop-modal 끝 -->
+	
+	
+	
+	<div class="stop-cancel-modal">
+	
+		<div class="stop-cancel-modal-body">
+			<h2>정지 해제 현황 조회</h2>
+			<button onclick="closeStopCancelList()">닫기</button>
+         
+        
+		<div class="stop-cancel-modal-content">
+			
+			<table id="historyTable">
+				<thead>
+					<tr>
+						<th>대여번호</th>
+						<th>회원명</th>
+						<th>도서제목</th>
+						<th>연체날짜</th>
+						<th>정지날짜</th>
+						<th>반납날짜</th>
+						
+						<th>정지전환</th>
+					</tr>
+				</thead>
+		
+				<tbody>
+				<%
+					
+					RentalDAO rentalDAO4 = new RentalDAO();
+					List<RentalDTO> stopCancelList = rentalDAO4.selectStopCancelMember();
+					if(stopCancelList != null){
+					for(int i=0; i<stopCancelList.size(); i++){
+					
+				%>
+					<tr>
+						<td id="st-cancel-rental-no<%=i%>" ><%=stopCancelList.get(i).getRentalno()%></td>
+						<td><%=stopCancelList.get(i).getMname()%></td>
+						<td><%=stopCancelList.get(i).getBookName()%></td>
+						
+						<td><%=stopCancelList.get(i).getOdDate()%></td>
+						<td><%=stopCancelList.get(i).getStDate()%></td>
+						<td><%=stopCancelList.get(i).getCoDate()%></td>
+						
+						
+						<td><button id="st-cancel-btn<%=i%>" onclick="convertToStopCancel(<%=i%>)"> 정지전환 </button></td>
+						
+						<!-- 연체 현황 조회를 위한 form과 hidden된 input창 (아직 구현X) -->
+						<form action="stop_cancel_action.jsp" method="POST" id="frm-stop-cancel">
+							<input type="hidden" id="input-st-cancel-rentno" name="StCancelRentalhiddenId">
+						</form>
+						
+					</tr>
+					<%}
+					}%>
+			</tbody>
+		</table>
+			
+		</div> <!-- stop-modal-content 끝 -->
+		</div> <!-- stop-modal-body 끝 -->
+	</div> <!-- stop-modal 끝 -->
 	
 	
 	
