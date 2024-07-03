@@ -51,7 +51,231 @@
 	request.setCharacterEncoding("UTF-8");
    	String ename = (String) session.getAttribute("ename");
    	String empno =  (String) session.getAttribute("empno");/* 로그인액션에서 정보를 받아 이름 확인 */  	
+   	
+   	//로그인이 정상적으로 완료되었다면
    	if (ename != null && empno != null) {%>
+    	
+   	
+   	<%
+   	request.setCharacterEncoding("UTF-8"); // 문자 인코딩 설정 한글 깨짐 방지
+
+   	MemberInfoDAO memberDAO = new MemberInfoDAO();
+   	List<MemberInfoDTO> memberList = null;
+
+   	RentalDAO rentalDAO = new RentalDAO();
+   	List<RentalDTO> rentalList = null;
+
+   	BookDAO bookDAO = new BookDAO();
+   	List<Book2DTO> getBookList = null;
+
+   	RentalStatusDAO rentalStatusDAO = new RentalStatusDAO();
+   	List<RentalStatusDTO> rentalStatusList = null;
+
+   	boolean isEmptyStr = false;
+   	List<String> db_params = new ArrayList<>();
+   	String targetStr = null;
+   	int targetNo = 0;
+   	int targetAllSelect = 0;
+
+   	// 관리자 입력 변수
+   	String m_membno = request.getParameter("m_membno");
+   	String m_mname = request.getParameter("m_mname");
+   	String m_mphone = request.getParameter("m_mphone");
+   	String m_mstatus = request.getParameter("m_mstatus");
+
+   	// 회원 대여 내역 조회
+   	String mr_memberno = request.getParameter("mr_memberno");
+   	String mr_membername = request.getParameter("mr_membername");
+   	String mr_memberphone = request.getParameter("mr_memberphone");
+
+   	// 대여 현황 조회
+   	String rs_rentnoStr = request.getParameter("rs_rentno");
+   	String rs_mname = request.getParameter("rs_mname");
+   	String rs_bname = request.getParameter("rs_bname");
+   	String rs_startDate = request.getParameter("rs_startDate");
+   	String rs_endDate = request.getParameter("rs_endDate");
+   	String rs_rstatus = request.getParameter("rs_rstatus");
+
+   	// 도서 검색
+   	String b_bookno = request.getParameter("b_bookno");
+   	String b_bname = request.getParameter("b_bname");
+   	String b_bauthor = request.getParameter("b_bauthor");
+   	String b_bpublish = request.getParameter("b_bpublish");
+   	String b_gname = request.getParameter("b_gname");
+   	String b_bcount = request.getParameter("b_bcount");
+
+   	String[] params = new String[] {
+   	    m_membno, m_mname, m_mphone, m_mstatus,
+   	    mr_memberno, mr_membername, mr_memberphone,
+   	    rs_rentnoStr, rs_mname, rs_bname, rs_startDate, rs_endDate, rs_rstatus,
+   	    b_bookno, b_bname, b_bauthor, b_bpublish, b_gname, b_bcount
+   	};
+
+   	for (int i = 0; i < params.length; i++) {
+   	    if (params[i] != null) {
+   	        db_params.add(params[i]);
+   	        targetAllSelect = i;
+   	    }
+   	}
+   	
+	if (db_params.size() != params.length) {
+	    for (String param : db_params) {
+	        if (param.equals("")) {
+	            isEmptyStr = true;
+	            break;
+	        }
+	    }
+	}
+
+	if (!isEmptyStr) {
+	    for (int i = 0; i < params.length; i++) {
+	        if (params[i] != null) {
+	            targetStr = params[i];
+	            targetNo = i;
+	            break;
+	        }
+	    }
+
+	    if (targetStr != null) {
+	        // List<String> targetList = Arrays.asList(params);
+	        switch (targetNo) {
+	            // 회원 정보 조회
+	            case 0:
+	                int membnoInt = Integer.parseInt(request.getParameter("m_membno"));
+	                memberList = memberDAO.selectMemberInfo(membnoInt);
+	                break;
+	            case 1:
+	                memberList = memberDAO.selectMnameInfo(m_mname);
+	                break;
+	            case 2:
+	                memberList = memberDAO.selectMphoneInfo(m_mphone);
+	                break;
+	            case 3:
+	                memberList = memberDAO.selectMstatusInfo(m_mstatus);
+	                break;
+	            // 회원 대여 내역 조회
+	            case 4:
+	                int mr_membernoInt = Integer.parseInt(mr_memberno);
+	                rentalList = rentalDAO.selectRentalMemberByNo(mr_membernoInt); // 회원번호로 대여내역 조회
+	                break;
+	            case 5:
+	                rentalList = rentalDAO.selectRentalMemberByName(mr_membername); // 회원이름으로 대여내역 조회
+	                break;
+	            case 6:
+	                rentalList = rentalDAO.selectRentalMemberByPhone(mr_memberphone); // 회원휴대폰번호로 대여내역 조회
+	                break;
+	            // 대여 현황 조회
+	            case 7:
+	                int rentno = Integer.parseInt(rs_rentnoStr);
+	                rentalStatusList = rentalStatusDAO.selectRentalByRentno(rentno);
+	                break;
+	            case 8:
+	                rentalStatusList = rentalStatusDAO.selectRentalByMname(rs_mname);
+	                break;
+	            case 9:
+	                rentalStatusList = rentalStatusDAO.selectRentalByBname(rs_bname);
+	                break;
+	            case 10:
+	                rentalStatusList = rentalStatusDAO.selectRentalByStartDateEndDate(rs_startDate, rs_endDate);
+	                break;
+	            case 11:
+	                // Logic for case 11 (if needed)
+	                break;
+	            case 12:
+	                switch (rs_rstatus) {
+	                    case "대여중":
+	                        rs_rstatus = "rt";
+	                        break;
+	                    case "연체중":
+	                        rs_rstatus = "od";
+	                        break;
+	                    case "반납완료":
+	                        rs_rstatus = "cp";
+	                        break;
+	                    case "예약":
+	                        rs_rstatus = "rs";
+	                        break;
+	                    case "예약취소":
+	                        rs_rstatus = "cc";
+	                        break;
+	                }
+	                rentalStatusList = rentalStatusDAO.selectRentalByRstatus(rs_rstatus);
+	                break;
+	            // 도서 정보
+	            case 13:
+	                if (b_bookno.isBlank()) { 
+	%>					
+	                    <script>alert("공백 안됨 다시 입력 Go!");</script>  					       						
+	<%				
+	                } else {
+	                    int bookno = Integer.parseInt(b_bookno);
+	                    getBookList = bookDAO.getBookNoList(bookno);
+	                }     
+	                break;
+	            case 14:
+	                getBookList = bookDAO.getBookNameList(b_bname);
+	                break;
+	            case 15:
+	                getBookList = bookDAO.getBookAuthorList(b_bauthor);
+	                break;
+	            case 16:
+	                getBookList = bookDAO.getBookPublishList(b_bpublish);
+	                break;
+	            case 17:
+	                getBookList = bookDAO.getBookGnameList(b_gname);
+	                break;
+	            case 18:
+	                if (b_bcount.isBlank()) {
+	%>				
+	                    <script>alert("공백 안됨 다시 입력 Go!");</script>  					
+	<%			
+	                } else {
+	                    int bcount = Integer.parseInt(b_bcount);
+	                    getBookList = bookDAO.getBookCountList(bcount);
+	                }
+	                break;
+	        }           			
+	    }
+	}
+
+	if (isEmptyStr) {
+	    // 회원 정보
+	    if (targetAllSelect >= 0 && targetAllSelect <= 3) {
+	        memberList = memberDAO.selectMemberInfoAll();
+	    } else if (targetAllSelect >= 4 && targetAllSelect <= 6) { // 회원 대여 내역 조회
+	        // 회원 대여내역 조회는 전체 조회 기능이 X
+	    } else if (targetAllSelect >= 7 && targetAllSelect <= 12) { // 대여 현황 조회
+	        if (rs_startDate == null && rs_endDate == null) { 
+	            rentalStatusList = rentalStatusDAO.selectAllRental();
+	        } else {
+	            if (rs_startDate.equals("") && !rs_endDate.equals("")) { 
+	%>
+	                <script>
+	                    alert("대여날짜를 입력해주세요!");
+	                </script>
+	<% 
+	            } else if (rs_endDate.equals("") && !rs_startDate.equals("")) { 
+	%>
+	                <script>
+	                    alert("종료범위를 지정해주세요!");
+	                </script>
+	<% 
+	            } else {
+	                rentalStatusList = rentalStatusDAO.selectAllRental(); 
+	            }
+	        }
+	    } else if (targetAllSelect >= 13 && targetAllSelect <= 18) { // 도서 정보 조회
+	        getBookList = bookDAO.getBookList();
+	    }
+	}
+	
+	//검색 기능 끝 
+	%>
+   	
+    	
+   	
+   	
+   	
 	
     <div class="header"><h1>도서 대여 시스템</h1></div>
  	<div class="section-title">"<%=ename %>"님 환영합니다.
@@ -85,7 +309,7 @@
 	     </thead>
 	     <tbody>
 	     	<%
-	     		BookDAO bookDAO = new BookDAO();
+	     		
 				List<EmployeeDTO> employeeList = bookDAO.getCommunityList();
 				if(employeeList != null){
 				for(EmployeeDTO employee : employeeList) {	
@@ -254,237 +478,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<%
-			request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
 
-			MemberInfoDAO memberDAO = new MemberInfoDAO();
-			List<MemberInfoDTO> memberList = null;
-			
-			RentalDAO rentalDAO = new RentalDAO();
-			List<RentalDTO> rentalList = null;
-			
-			List<Book2DTO> getBookList = null;
-			
-			RentalStatusDAO rentalStatusDAO = new RentalStatusDAO();
-           	List<RentalStatusDTO> rentalStatusList = null;
-			
-			
-			
-			
-			
-			boolean isEmptyStr = false;
-           	List<String> db_params = new ArrayList<>();
-           	String targetStr = null;
-           	int targetNo = 0;
-           	int targetAllSelect = 0;
-           	
-           	//관리자 입력 변수
-           	String m_membno = request.getParameter("m_membno");
-			String m_mname = request.getParameter("m_mname");
-			String m_mphone = request.getParameter("m_mphone");
-			String m_mstatus = request.getParameter("m_mstatus");
-			
-			//회원 대여 내역 조회
-			String mr_memberno = request.getParameter("mr_memberno");
-			String mr_membername = request.getParameter("mr_membername");
-			String mr_memberphone = request.getParameter("mr_memberphone");
-			
-			//대여 현황 조회
-			String rs_rentnoStr = request.getParameter("rs_rentno");
-           	String rs_mname = request.getParameter("rs_mname"); 
-           	String rs_bname = request.getParameter("rs_bname"); 
-           	String rs_startDate = request.getParameter("rs_startDate"); 
-           	String rs_endDate = request.getParameter("rs_endDate"); 
-           	String rs_rstatus = request.getParameter("rs_rstatus");    
-			
-			//도서검색
-			String b_bookno = request.getParameter("b_bookno");
-			String b_bname = request.getParameter("b_bname");
-			String b_bauthor = request.getParameter("b_bauthor");
-			String b_bpublish = request.getParameter("b_bpublish");
-			String b_gname = request.getParameter("b_gname");
-			String b_bcount = request.getParameter("b_bcount");
-			
-			String[] params = new String[] {
-					m_membno, m_mname, m_mphone, m_mstatus,
-					mr_memberno, mr_membername, mr_memberphone,
-					rs_rentnoStr, rs_mname, rs_bname, rs_startDate, rs_endDate, rs_rstatus,
-					b_bookno, b_bname, b_bauthor, b_bpublish, b_gname, b_bcount
-					};
-			
-		
-			
-			
-			for(int i=0; i< params.length; i++){
-       			if (params[i] != null) {
-       				db_params.add(params[i]);
-       				targetAllSelect = i; 
-       			}
-           	}
-           	
-           	if (db_params.size() != params.length) {
-           		for (String param : db_params) {
-           			if (param.equals("")) {
-           				isEmptyStr = true;
-           				
-           				break;
-           			}
-           		}
-           	}
-           	
-           	if (!isEmptyStr) {
-           		for (int i = 0; i < params.length; i++) {
-           			if (params[i] != null) {
-           				targetStr = params[i];
-           				targetNo = i;
-           				break;
-           			}
-           		}
-           		
-           		if (targetStr != null) {
-           			//List<String> targetList = Arrays.asList(params);
-           			
-           			switch (targetNo) {
-           				//회원 정보 조회
-           				case 0:
-           					int membnoInt = Integer.parseInt(request.getParameter("m_membno"));
-       						memberList = memberDAO.selectMemberInfo(membnoInt);
-       	           			break;
-           				case 1:
-           					//int rentno = Integer.parseInt(str_rentno);
-           					memberList = memberDAO.selectMnameInfo(m_mname);
-           	           		break;
-           				case 2:
-           					memberList = memberDAO.selectMphoneInfo(m_mphone);
-           	           		break;
-           				case 3:
-           					memberList = memberDAO.selectMstatusInfo(m_mstatus);
-           	           		break;
-           	           	//회원 대여 내역 조회
-           				case 4:
-           					int mr_membernoInt = Integer.parseInt(mr_memberno);
-           					rentalList = rentalDAO.selectRentalMemberByNo(mr_membernoInt); //회원번호로 대여내역 조회
-							break;
-						case 5:
-							rentalList = rentalDAO.selectRentalMemberByName(mr_membername); //회원이름으로 대여내역 조회
-           	           		break;
-						case 6:
-							rentalList = rentalDAO.selectRentalMemberByPhone(mr_memberphone); //회원휴대폰번호로 대여내역 조회
-  							break;
-						//대여 현황 조회	
-						case 7:
-							int rentno = Integer.parseInt(rs_rentnoStr);
-           	           		rentalStatusList = rentalStatusDAO.selectRentalByRentno(rentno);
-							break;
-						case 8:
-							rentalStatusList = rentalStatusDAO.selectRentalByMname(rs_mname);
-							break;
-						case 9:
-							rentalStatusList = rentalStatusDAO.selectRentalByBname(rs_bname);
-							break;
-						case 10:
-							rentalStatusList = rentalStatusDAO.selectRentalByStartDateEndDate(rs_startDate , rs_endDate);
-							break;
-						case 11:
-							
-							break;
-						case 12:
-							switch (rs_rstatus) {
-	       						case "대여중":
-	       							rs_rstatus = "rt";
-	       							break;
-	       						case "연체중":
-	       							rs_rstatus = "od";
-	       							break;
-	       						case "반납완료":
-	       							rs_rstatus = "cp";
-	       							break;
-	       						case "예약":
-	       							rs_rstatus = "rs";
-	       							break;
-	       						case "예약취소":
-	       							rs_rstatus = "cc";  
-	       							break;
-	       					}
-							rentalStatusList = rentalStatusDAO.selectRentalByRstatus(rs_rstatus);
-       	           		
-							break;
-						// 도서 정보
-						case 13:
-							if (b_bookno.isBlank()) { 
-						       	%>					
-						       		<script>alert("공백 안됨 다시 입력 Go!");</script>  					       						
-						       	<%				
-						    }else{
-						       	int bookno = Integer.parseInt(b_bookno);
-						       	getBookList = bookDAO.getBookNoList(bookno);
-						    }     
-							break;
-						case 14:
-							getBookList = bookDAO.getBookNameList(b_bname);
-							break;
-						case 15:
-							getBookList = bookDAO.getBookAuthorList(b_bauthor);
-							break;
-						case 16:
-							getBookList = bookDAO.getBookPublishList(b_bpublish);
-							break;
-						case 17:
-							getBookList = bookDAO.getBookGnameList(b_gname);
-							break;
-						case 18:
-							if(b_bcount.isBlank()){
-						       	%>				
-						       	<script>alert("공백 안됨 다시 입력 Go!");</script>  					
-						       	<%			
-						    }else{
-						       	int bcount = Integer.parseInt(b_bcount);
-						       	getBookList = bookDAO.getBookCountList(bcount);
-						    }
-							break;
-							
-           	           		
-           	           		
-           			}           			
-           		}
-           	}
-           	
-           	if (isEmptyStr) {
-           		
-           		//회원 정보
-           		if(targetAllSelect >= 0 && targetAllSelect <= 3){
-           			memberList = memberDAO.selectMemberInfoAll();
-           		} else if(targetAllSelect >= 4 && targetAllSelect <= 6){ //회원 대여 내역 조회
-           			
-           		} else if(targetAllSelect >= 7 && targetAllSelect <= 12 ){ //대여 현황 조회
-           			if (rs_startDate == null && rs_endDate == null){ 
-               			rentalStatusList = rentalStatusDAO.selectAllRental();
-               		} else {
-    					if (rs_startDate.equals("") && !rs_endDate.equals("")) { %>
-    						<script>
-    						alert("대여날짜를 입력해주세요!");
-    						</script>
-    				 <% } else if (rs_endDate.equals("") && !rs_startDate.equals("")) { %>
-    				 		<script>
-    						alert("종료범위를 지정해주세요!");
-    						</script>
-    				 <% } else {
-    				 		rentalStatusList = rentalStatusDAO.selectAllRental(); 
-    				 	}
-               	  }
-           			
-           			
-           			
-           		} else if(targetAllSelect >= 13 && targetAllSelect <= 18) { //도서 정보 조회
-           			getBookList = bookDAO.getBookList();
-           		}
-           			
-           		
-           		
-           	}
-           	////////////////////////////
-		
-			%>
 
 			<%
 			if (memberList != null) {
@@ -642,26 +636,28 @@
 					//tr이 행, td가 열
 					RentalDAO rentalDAO2 = new RentalDAO();
 					List<RentalDTO> overdueMemberList = rentalDAO2.selectOverdueMember();
-					for(int i=0; i<overdueMemberList.size(); i++){
+					if(overdueMemberList != null){
+						for(int i=0; i<overdueMemberList.size(); i++){
 					
-				%>
-					<tr>
-						<td id="od-rental-no<%=i%>" ><%=overdueMemberList.get(i).getRentalno()%></td>
-						<td><%=overdueMemberList.get(i).getMname()%></td>
-						<td><%=overdueMemberList.get(i).getBookName()%></td>
-						<td><%=overdueMemberList.get(i).getrDate()%></td>
-						<td><%=overdueMemberList.get(i).getRtDate()%></td>
-						<td><%=overdueMemberList.get(i).getrStatus()%></td>
-						
-						<td><button id="od-btn<%=i%>" onclick="convertToOverdue(<%=i%>)"> 연체전환 </button></td>
-						
-						<!-- 연체 현황 조회를 위한 form과 hidden된 input창 (아직 구현X) -->
-						<form action="overdue_action.jsp" method="POST" id="frm-overdue">
-							<input type="hidden" id="input-od-rentno" name="OdRentalhiddenId">
-						</form>
-						
-					</tr>
-					<%}%>
+					%>
+							<tr>
+								<td id="od-rental-no<%=i%>" ><%=overdueMemberList.get(i).getRentalno()%></td>
+								<td><%=overdueMemberList.get(i).getMname()%></td>
+								<td><%=overdueMemberList.get(i).getBookName()%></td>
+								<td><%=overdueMemberList.get(i).getrDate()%></td>
+								<td><%=overdueMemberList.get(i).getRtDate()%></td>
+								<td><%=overdueMemberList.get(i).getrStatus()%></td>
+								
+								<td><button id="od-btn<%=i%>" onclick="convertToOverdue(<%=i%>)"> 연체전환 </button></td>
+								
+								<!-- 연체 현황 조회를 위한 form과 hidden된 input창 (아직 구현X) -->
+								<form action="overdue_action.jsp" method="POST" id="frm-overdue">
+									<input type="hidden" id="input-od-rentno" name="OdRentalhiddenId">
+								</form>
+								
+							</tr>
+						<%}
+					}%>
 			</tbody>
 		</table>
 			
@@ -1293,7 +1289,7 @@
 		<script> 
 		alert('로그인을 해주세요'); 
  	location.href = 'empLogin.jsp';	 
- 		</script> -->
+ 		</script>
 	 <% 
      }
     %>
