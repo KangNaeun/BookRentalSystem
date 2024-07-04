@@ -27,7 +27,8 @@ public class MemberInfoDAO {
 			conn = DBConnectionManager.connectDB();
 
 			String query = "select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
-					+ "from memberInfo m, member_status ms " + "where m.mstatus_id = ms.mstatus_id";
+					+ "from memberInfo m, member_status ms "
+					+ "where m.mstatus_id = ms.mstatus_id order by m.membno ";
 
 			psmt = conn.prepareStatement(query);
 
@@ -199,7 +200,7 @@ public class MemberInfoDAO {
 
 			String query = " select m.membno, m.mname, m.mphone, m.maddress, ms.mstatus "
 					+ "from memberInfo m, member_status ms " + "where m.mstatus_id = ms.mstatus_id "
-					+ "and ms.mstatus = ? ";
+					+ "and ms.mstatus = ? order by m.membno ";
 
 			psmt = conn.prepareStatement(query);
 			psmt.setString(1, mstatus);

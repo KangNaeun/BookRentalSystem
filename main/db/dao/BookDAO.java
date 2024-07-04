@@ -113,7 +113,7 @@ public class BookDAO {
 							+ " 	TO_CHAR(b.bdate, 'YYYY-MM-DD') bdate "
 							+ " 	, bq.bcount "
 							+ " FROM book b, genre g, book_quantity bq "
-							+ " WHERE b.genrno = g.genrno and b.bookno = bq.bookno ";
+							+ " WHERE b.genrno = g.genrno and b.bookno = bq.bookno order by b.bookno ";
 			
 			psmt = conn.prepareStatement(query);
 
@@ -253,7 +253,7 @@ public class BookDAO {
 							+ " 	, bq.bcount "
 							+ " FROM book b, genre g, book_quantity bq "
 							+ " WHERE b.genrno = g.genrno and b.bookno = bq.bookno "
-							+ " 	 and b.bauthor = ?";
+							+ " 	 and b.bauthor = ? order by b.bookno ";
 			
 			psmt = conn.prepareStatement(query);
 			psmt.setString(1, bauthor);
@@ -300,7 +300,7 @@ public class BookDAO {
 							+ " 	, bq.bcount "
 							+ " FROM book b, genre g, book_quantity bq "
 							+ " WHERE b.genrno = g.genrno and b.bookno = bq.bookno "
-							+ " 	 and b.bpublish = ?";
+							+ " 	 and b.bpublish = ? order by b.bookno ";
 			
 			psmt = conn.prepareStatement(query);
 			psmt.setString(1, bpublish);
@@ -347,7 +347,7 @@ public class BookDAO {
 							+ " 	, bq.bcount "
 							+ " FROM book b, genre g, book_quantity bq "
 							+ " WHERE b.genrno = g.genrno and b.bookno = bq.bookno "
-							+ " 	 and g.gname = ?";
+							+ " 	 and g.gname = ? order by b.bookno ";
 			
 			psmt = conn.prepareStatement(query);
 			psmt.setString(1, gname);
@@ -394,7 +394,7 @@ public class BookDAO {
 							+ " 	, bq.bcount "
 							+ " FROM book b, genre g, book_quantity bq "
 							+ " WHERE b.genrno = g.genrno and b.bookno = bq.bookno "
-							+ " 	 and bq.bcount = ?";
+							+ " 	 and bq.bcount = ? order by b.bookno ";
 			
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, bcount);

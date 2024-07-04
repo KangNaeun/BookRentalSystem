@@ -1,6 +1,4 @@
 <%@ page import="db.dao.JoinDAO"%>
-<%@ page import="db.dto.FindDTO"%>
-<%@ page import="java.util.List" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -65,7 +63,7 @@
             }
             .section_box02 {
                 width: 500px;
-                height: 150px;
+                height: 100px;
                 border: 1px solid #BDBDBD;
                 padding-right: 1em;
                 padding-left: 1em;
@@ -110,36 +108,40 @@
 	<body>
     <div class="main">
         <header>
-            <div class="titlebox">로그인</div>
+            <div class="titlebox">회원가입</div>
         </header>
 
         <section>
             <div class="fullbox">
                 <div class="middlebox">
-                    <form action='empLogin.jsp' method="post">
-                        
-                        <div class="section_box02">
+                    <form action='joinMember.jsp' method="post">
+                        <div class="section_box01">
                             <div>
-                                아이디 :
+                                사용자 ID :
                                 <input type="text" name="input_join_emp_id"><br><br>
                             </div>
                             <div>
-                                비밀번호 :
-                                <input type="text" name="input_join_password"><br><br>
+                                비밀 번호 :
+                                <input type="password" name="input_join_password">
                             </div>
                             
+                        </div>
+                        <br>
+                        <div class="section_box02">
                             <div>
-                            	<button type="button"onclick="location.href='joinMember.jsp';">회원가입</button>                     	
-                        		<button type="button"onclick="location.href='findId.jsp';">아이디찾기</button>
-                        		<button type="button" onclick="location.href='findPw.jsp';">비밀번호찾기</button>
-                        	</div>
+                                이름 :
+                                <input type="text" name="input_join_ename"><br><br>
+                            </div>
+                            <div>
+                                생년월일 :
+                                <input type="text" name="input_join_ebirth">
+                            </div>
 
                         </div>
                         <br>
-                        <div class="section_box03" >
-                        	
+                        <div class="section_box03">
                             <div>
-                                <center> <button type="submit" id="join"> 로그인 </button> </center>
+                                <center> <button type="submit" id="join"> 회원가입 </button> </center>
                             </div>
                         </div>
                     </section>
@@ -149,41 +151,61 @@
     </div>
     
     <%
-   request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
+    request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
     
     String emp_id = request.getParameter("input_join_emp_id");
+    String ename = request.getParameter("input_join_ename");
     String password = request.getParameter("input_join_password");
-
-    String[] params =  new String[]{emp_id, password};
+    String ebirth = request.getParameter("input_join_ebirth");
+    
+    String[] params =  new String[]{emp_id,  ename, password, ebirth};
+    
+    boolean isParamsNull = false;
+    boolean isParamsBlank = false;
     
     for( int i = 0; i < params.length; i++  ){
-    	if( params[i] == null ){
-    		
-    	}else{
-    		
-    		 JoinDAO joinDAO = new JoinDAO(); 
-    		 List<FindDTO> employeeList = joinDAO.loginEmployee(emp_id, password);
-    		 
-    		 if(employeeList!=null){
-    			 for(FindDTO login : employeeList){
-    				 session.setAttribute("ename", login.getEname());
-    				 session.setAttribute("empno", login.getEmp_id());%>
-    		 		<script>
-    				 alert("<%=login.getEname()%>님 환영합니다.");
-    				 location.href="bookRentalSystem.jsp";
-    				 </script>
-    		<% }
-    	}  else {%>
-    		<script>
-			 alert("로그인 실패. 다시 로그인 해주세요");
-			 location.href="bookRentalSystem.jsp";
-			 </script>
-    	<%}
-    	  
- 
+    	if( params[i] == null){
+    		isParamsNull = true;
+    		break;
+    	}
+    	if( params[i].equals("")){
+    		isParamsBlank = true;
+    		break;
+    	}
     }
-    		
-   } %>
+    
+    
+   
+    
+   
+    
+    if(!isParamsNull && !isParamsBlank){
+		JoinDAO joinDAO = new JoinDAO();
+		int result= joinDAO.joinEmployee(emp_id, ename, password, ebirth);
+		
+		if(result > 0){%>
+			<script>
+				alert("회원이 되신 걸 축하드립니다! 로그인 해주세요.");
+				location.href="empLogin.jsp";
+			</script>
+		<%} else {%>
+			<script>
+				alert("회원가입 실패! 다시 회원가입 해주세요");
+				history.back();
+			</script>
+		<%}
+    } else if(!isParamsNull){%>
+    	<script>
+			alert("모든 항목을 바르게 입력해주요.");
+			history.back();
+		</script>
+   <% }%>
+    
+    
+    
+    
+    	 
+   
 
     </body>
 </body>

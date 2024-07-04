@@ -65,7 +65,7 @@
             }
             .section_box02 {
                 width: 500px;
-                height: 150px;
+                height: 100px;
                 border: 1px solid #BDBDBD;
                 padding-right: 1em;
                 padding-left: 1em;
@@ -110,13 +110,13 @@
 	<body>
     <div class="main">
         <header>
-            <div class="titlebox">로그인</div>
+            <div class="titlebox">PW 찾기</div>
         </header>
 
         <section>
             <div class="fullbox">
                 <div class="middlebox">
-                    <form action='empLogin.jsp' method="post">
+                    <form action='findPw.jsp' method="post">
                         
                         <div class="section_box02">
                             <div>
@@ -124,22 +124,15 @@
                                 <input type="text" name="input_join_emp_id"><br><br>
                             </div>
                             <div>
-                                비밀번호 :
-                                <input type="text" name="input_join_password"><br><br>
+                                생년월일 :
+                                <input type="text" name="input_join_ebirth"><br><br>
                             </div>
-                            
-                            <div>
-                            	<button type="button"onclick="location.href='joinMember.jsp';">회원가입</button>                     	
-                        		<button type="button"onclick="location.href='findId.jsp';">아이디찾기</button>
-                        		<button type="button" onclick="location.href='findPw.jsp';">비밀번호찾기</button>
-                        	</div>
 
                         </div>
                         <br>
-                        <div class="section_box03" >
-                        	
+                        <div class="section_box03">
                             <div>
-                                <center> <button type="submit" id="join"> 로그인 </button> </center>
+                                <center> <button type="submit" id="join"> 찾기 </button> </center>
                             </div>
                         </div>
                     </section>
@@ -152,39 +145,34 @@
    request.setCharacterEncoding("UTF-8"); //문자 인코딩 설정 한글깨짐 방지
     
     String emp_id = request.getParameter("input_join_emp_id");
-    String password = request.getParameter("input_join_password");
+    String ebirth = request.getParameter("input_join_ebirth");
 
-    String[] params =  new String[]{emp_id, password};
+    String[] params =  new String[]{emp_id, ebirth};
+    
+	boolean isParamsNull = false;
     
     for( int i = 0; i < params.length; i++  ){
     	if( params[i] == null ){
-    		
-    	}else{
-    		
-    		 JoinDAO joinDAO = new JoinDAO(); 
-    		 List<FindDTO> employeeList = joinDAO.loginEmployee(emp_id, password);
-    		 
-    		 if(employeeList!=null){
-    			 for(FindDTO login : employeeList){
-    				 session.setAttribute("ename", login.getEname());
-    				 session.setAttribute("empno", login.getEmp_id());%>
-    		 		<script>
-    				 alert("<%=login.getEname()%>님 환영합니다.");
-    				 location.href="bookRentalSystem.jsp";
-    				 </script>
-    		<% }
-    	}  else {%>
-    		<script>
-			 alert("로그인 실패. 다시 로그인 해주세요");
-			 location.href="bookRentalSystem.jsp";
-			 </script>
-    	<%}
-    	  
- 
-    }
-    		
+    		isParamsNull = true;
+    		break;
+     	}
+    
+    }	
+    
+    if(!isParamsNull){
+  		 JoinDAO joinDAO = new JoinDAO(); 
+  		 List<FindDTO> findList = joinDAO.findPw(emp_id, ebirth);  		 
+  		 
+  		 if(findList!=null){
+  			 for(FindDTO find : findList){ %>
+  				<script>
+  				 	alert(" 비밀번호 : <%=find.getPassword()%> " );
+  	    			location.href="empLogin.jsp";
+  	   			</script>
+  		<% 
+   		}
+   	} 
    } %>
-
     </body>
 </body>
 

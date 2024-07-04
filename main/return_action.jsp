@@ -50,7 +50,7 @@
 		//해당 회원이 더 이상 빌린 책이 없다면
 		if(countRental == 0){
 			//회원이 빌린 모든 책이 반납 완료면, 'nrt'로 회원 상태 변경
-			//정지 회원이 아닌경우에만!!!!!!!(조건 추가, 아직구현X)***********
+			//정지 회원이 아닌경우에만!!!!!!!
 			int updateStatus = returnDAO.updateMemberStatusToNRT(returnDTO.getMembno());
 			
 			//'nrt'로 회원 상태 update가 잘되었으면
@@ -68,25 +68,11 @@
 			if(overdueCount == 0){ //연체상태인데 연체된 책이 더 이상 없으면 회원 상태를'rt'로 상태전환
 				int updateToRT =returnDAO.updateMemberStatusToRT(returnDTO.getMembno());
 					
-				//'rt'로 상태전환이 잘 되었으면
-				if(updateToRT > 0){%>
-					<script>
-						alert("회원 상태 연체 -> 대여로 전환!");
-					</script>
-				<%} else{%>
-						<script>
-							alert("연체 상태인 회원입니다.");
-						</script>
-				<%}
+
 			}
 			
-			%>
-			
-			<script>
-				alert("아직 반납해야 할 책이 남았습니다.");
-				
-			</script>
-	<%}
+
+	 }%>
 	} else{ //'cp' 상태로 update가 안되면(로직 오류로 반납 실패) %> 
 		<script>
 			alert("반납처리 실패");
