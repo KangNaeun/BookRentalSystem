@@ -158,9 +158,9 @@
     
     for( int i = 0; i < params.length; i++  ){
     	if( params[i] == null ){
-    		System.out.println(params[i]);
+    		
     	}else{
-    		System.out.println(params[i]);
+    		
     		 JoinDAO joinDAO = new JoinDAO(); 
     		 List<FindDTO> employeeList = joinDAO.loginEmployee(emp_id, password);
     		 

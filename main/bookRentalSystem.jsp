@@ -103,21 +103,22 @@
    	String b_bpublish = request.getParameter("b_bpublish");
    	String b_gname = request.getParameter("b_gname");
    	String b_bcount = request.getParameter("b_bcount");
-
+	
+   	//input창의 결과를 String 배열로 생성
    	String[] params = new String[] {
    	    m_membno, m_mname, m_mphone, m_mstatus,
    	    mr_memberno, mr_membername, mr_memberphone,
    	    rs_rentnoStr, rs_mname, rs_bname, rs_startDate, rs_endDate, rs_rstatus,
    	    b_bookno, b_bname, b_bauthor, b_bpublish, b_gname, b_bcount
    	};
-
+	//배열 값이 null이 아니면(""이거나 실제 값이 들어있는 경우)
    	for (int i = 0; i < params.length; i++) {
    	    if (params[i] != null) {
    	        db_params.add(params[i]);
    	        targetAllSelect = i;
    	    }
    	}
-   	
+   	//db_params 에 값이 ""인 경우
 	if (db_params.size() != params.length) {
 	    for (String param : db_params) {
 	        if (param.equals("")) {
@@ -126,7 +127,7 @@
 	        }
 	    }
 	}
-
+	//실제로 값이 들어있는 경우 (targetStr에 값, targetNo에는 인덱스를 긁어옴)
 	if (!isEmptyStr) {
 	    for (int i = 0; i < params.length; i++) {
 	        if (params[i] != null) {
@@ -135,7 +136,7 @@
 	            break;
 	        }
 	    }
-
+		//긁어온 값이 null이 아니면
 	    if (targetStr != null) {
 	        // List<String> targetList = Arrays.asList(params);
 	        switch (targetNo) {
@@ -176,10 +177,8 @@
 	                rentalStatusList = rentalStatusDAO.selectRentalByBname(rs_bname);
 	                break;
 	            case 10:
-	                rentalStatusList = rentalStatusDAO.selectRentalByStartDateEndDate(rs_startDate, rs_endDate);
-	                break;
 	            case 11:
-	                // Logic for case 11 (if needed)
+	                rentalStatusList = rentalStatusDAO.selectRentalByStartDateEndDate(rs_startDate, rs_endDate);
 	                break;
 	            case 12:
 	                switch (rs_rstatus) {

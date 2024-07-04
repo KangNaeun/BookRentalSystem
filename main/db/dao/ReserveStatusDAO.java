@@ -27,7 +27,8 @@ public List<ReserveStatusDTO> selectAllReserveStatus() {
 					+ "    TO_CHAR(r.reserve_comp_date, 'YYYY-MM-DD') reserve_comp_date, "
 					+ "    r.reserve_status, b.bookno, m.membno "
 					+ " FROM reservation r, memberInfo m, book b "
-					+ " WHERE r.membno = m.membno AND r.bookno = b.bookno ";
+					+ " WHERE r.membno = m.membno AND r.bookno = b.bookno "
+					+ " ORDER BY r.reserve_id ";
 					
 			psmt = conn.prepareStatement(query);
 			
@@ -120,7 +121,7 @@ public List<ReserveStatusDTO> selectAllReserveStatus() {
 	                + "    "
 	                + "    SELECT membno INTO s_membno "
 	                + "    FROM memberInfo "
-	                + "    WHERE mstatus_id = 'nrt' AND membno = v_membno; "
+	                + "    WHERE mstatus_id IN ('nrt', 'rt', 'rs') AND membno = v_membno; "
 	                + "    "
 	                + "    IF s_membno IS NOT NULL THEN "
 	                + "        UPDATE memberInfo "
