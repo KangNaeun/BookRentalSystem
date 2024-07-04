@@ -64,7 +64,7 @@
 				</tbody>
 			 </table>
 	  		<button type = 'button' id="btn_msg" onclick="msg()"> 알림메세지전송 </button>
-	  	  </form>
+	  	  
 	
       </div>
          

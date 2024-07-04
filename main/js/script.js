@@ -189,7 +189,7 @@ function bookqClick() {
 }
 
 function employeeClick() {
-	const mydiv = document.getElementById('employee');
+	const mydiv = document.querySelector('.notice-container');
 	const style = window.getComputedStyle(mydiv);
 	
     if (style.display === 'none') {
@@ -200,7 +200,7 @@ function employeeClick() {
 }
 
 function communityClick() {
-	    const mydiv = document.getElementById('community');
+    const mydiv = document.querySelector('.notice-container');
     if (mydiv.style.display === 'none') {
         mydiv.style.display = 'block';
     } else {
@@ -230,11 +230,7 @@ function sendMsg() { //알림메세지 전송
 
 //회원추가	
 function openAdd() { //회원추가 모달창 열기
-	document.querySelector('.add-page').style.display = 'block';
-}
-
-function closeAdd() { //회원추가 모달창 닫기
-	document.querySelector('.add-page').style.display = 'none';
+	document.querySelector('.member-message-container').style.display = 'flex';
 }
 
 function add() { //회원추가
@@ -244,11 +240,11 @@ function add() { //회원추가
 
 //회원알림
 function openSelect(){ //회원추가 모달창 열기
-	document.querySelector('.select-page').style.display ='block';
+	document.querySelector('.add-page').style.display ='block';
 }
 
 function closeSelect(){ //회원추가 모달창 닫기
-	document.querySelector('.select-page').style.display ='none';
+	document.querySelector('.add-page').style.display ='none';
 }
 
 
@@ -265,11 +261,11 @@ function closeSelect(){ //회원추가 모달창 닫기
 
 /* ***************** 나은 ***************** */
 function openStopCancelList(){
-	document.querySelector(".stop-cancel-modal").style.display = 'flex';
+	document.querySelector(".stop-clear-status-container").style.display = 'flex';
 }
 
 function closeStopCancelList(){
-	document.querySelector(".stop-cancel-modal").style.display = 'none';
+	document.querySelector(".stop-clear-status-container").style.display = 'none';
 }
 
 
@@ -313,12 +309,12 @@ function convertToOverdue(i){
 
 function openStopList(){
 	//정지 현황 모달창 flex
-	document.querySelector(".stop-modal").style.display = 'flex';
+	document.querySelector(".stop-status-container").style.display = 'flex';
 }
 
 function closeStopList(){
 	//정지 현황 모달창 none
-	document.querySelector(".stop-modal").style.display = 'none';
+	document.querySelector(".stop-status-container").style.display = 'none';
 }
 
 
@@ -368,12 +364,12 @@ function closeRt(){
 //연체조회버튼이 눌리면 modal창을 나오게 하는 함수(아직 구현X)
 function openOverdueList(){
 	console.log("연체조회 버튼 눌림");
-	document.querySelector(".overdue-modal").style.display = 'flex';
+	document.querySelector(".overdue-status-container").style.display = 'flex';
 }
 
 function closeOverdueList(){
 	console.log("연체조회 버튼 눌림");
-	document.querySelector(".overdue-modal").style.display = 'none';
+	document.querySelector(".overdue-status-container").style.display = 'none';
 }
 
 
