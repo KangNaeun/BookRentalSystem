@@ -677,7 +677,7 @@ public class RentalDAO {
 
 			conn = DBConnectionManager.connectDB();
 
-			String query = " select count(bookno) 책수량 from rental where bookno = ? and rstatus_id NOT IN ('cp', 'cc') ";
+			String query = " select count(bookno) 책수량 from rental where bookno = ? and rstatus_id NOT IN ('cp', 'cc', 'rs') ";
 
 			psmt = conn.prepareStatement(query);
 			psmt.setInt(1, bookno);

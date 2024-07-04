@@ -24,6 +24,11 @@
 		int result = addDAO.insertMemberInfo(mname, maddress, mphone); //insertMemberInfo메서드를 호출하고 회원정보를 result에 저장, 결과를 int로 반환
 		
 	  %>
+	  
+	  <script>
+        alert("회원 추가 완료!");
+        location.href="bookRentalSystem.jsp";
+     </script>
 
 </body>
 </html>

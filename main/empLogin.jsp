@@ -125,7 +125,7 @@
                             </div>
                             <div>
                                 비밀번호 :
-                                <input type="text" name="input_join_password"><br><br>
+                                <input type="password" name="input_join_password"><br><br>
                             </div>
                             
                             <div>

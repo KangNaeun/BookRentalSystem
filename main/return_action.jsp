@@ -72,8 +72,8 @@
 			}
 			
 
-	 }%>
-	} else{ //'cp' 상태로 update가 안되면(로직 오류로 반납 실패) %> 
+	 }
+	} else{  %> 
 		<script>
 			alert("반납처리 실패");
 		</script>

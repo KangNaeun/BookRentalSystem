@@ -585,7 +585,11 @@
 
 				<td><%=rentalList.get(i).getrStatus()%></td>
 
-				<td><button type = 'button' id="btn_return_page<%=i%>" onclick="openConfirmReturn(<%=i%>)">반납</button></td>
+				<td>
+					<% if ( (rentalList.get(i).getrStatus().equals("대여중")) || (rentalList.get(i).getrStatus().equals("연체중")) || (rentalList.get(i).getrStatus().equals("정지"))) { %>
+					<button type = 'button' id="btn_return_page<%=i%>" onclick="openConfirmReturn(<%=i%>)">반납</button>
+					<%}%>
+				</td>
 				
 				<!-- 대여현황조회 form을 위해 hidden 타입의 input창 생성 -->
 				<form action="return_action.jsp" method="POST" id="frm-return">
@@ -744,7 +748,6 @@
 						<th>대여날짜</th>
 						<th>반납기한</th>
 						<th>연체날짜</th>
-						<th>대여상태</th>
 						<th>정지전환</th>
                     </tr>
                 </thead>
@@ -1185,9 +1188,7 @@
 	                        			</script>
 	                        			<strong>예약</strong>
 	                        		</button>
-	                        	<%} else {%>
-	                        		<button id="" class="btn">대여</button>
-	                        	<%}%>
+	                        	<%} %>
 	                        </td>
                     	</tr>
                 	<% }
