@@ -586,7 +586,7 @@
 				<td><%=rentalList.get(i).getrStatus()%></td>
 
 				<td>
-					<% if ( (rentalList.get(i).getrStatus().equals("대여중")) || (rentalList.get(i).getrStatus().equals("연체중")) || (rentalList.get(i).getrStatus().equals("정지"))) { %>
+					<% if ( (rentalList.get(i).getrStatus().equals("대여중")) || (rentalList.get(i).getrStatus().equals("연체중")) || (rentalList.get(i).getrStatus().equals("정지")) ) { %>
 					<button type = 'button' id="btn_return_page<%=i%>" onclick="openConfirmReturn(<%=i%>)">반납</button>
 					<%}%>
 				</td>
@@ -612,9 +612,9 @@
 	
 	<div class="section-title">
 		<span>대여 현황 조회</span>
-        &nbsp;&nbsp;&nbsp;<button type="button" class="btn" onclick="openOverdueList()">연체현황조회</button>
-        &nbsp;&nbsp;<button type="button" class="btn" onclick="openStopList()">정지현황조회</button>
-        &nbsp;&nbsp;<button type="button" class="btn" onclick="openStopCancelList()">정지해제가능회원조회</button>
+        &nbsp;&nbsp;&nbsp;<button type="button" class="btn" onclick="openOverdueList()">연체전환</button>
+        &nbsp;&nbsp;<button type="button" class="btn" onclick="openStopList()">정지전환</button>
+        &nbsp;&nbsp;<button type="button" class="btn" onclick="openStopCancelList()">정지해제전환</button>
 		&nbsp;&nbsp;<button type="button" class="btn btn-reserve-status" onclick="open933()">예약내역조회</button>
         <script>
     		function open933() {
@@ -630,7 +630,7 @@
 	</div>
 	
 	<div class="modal-container overdue-status-container">
-        <div class="reserve-status-title">연체현황조회</div>
+        <div class="reserve-status-title">연체전환조회</div>
         <div class="btn-close" onclick="closeOverdueList()">&nbsp;X&nbsp;</div>
         <div class="reserve-status-table-container">
             <table id="reserve-status-table" style="width: 684px;">
@@ -682,7 +682,7 @@
 	
 	
 	<div class="modal-container stop-status-container" style="font-size: 0.9em;">
-        <div class="reserve-status-title" >정지현황조회</div>
+        <div class="reserve-status-title" >정지전환조회</div>
         <div class="btn-close" onclick="closeStopList()">&nbsp;X&nbsp;</div>
         <div class="reserve-status-table-container">
             <table id="reserve-status-table" style="width: 684px;">
@@ -996,7 +996,7 @@
 		           		<td><%=rentalStatusList.get(i).getComp_date()%></td>
 		           		<td><%=rentalStatusList.get(i).getRstatus()%></td>
 		           		<td>
-		           			<% if (!"반납완료".equals(rentalStatusList.get(i).getRstatus())) { %>
+		           			<% if ((rentalStatusList.get(i).getRstatus().equals("대여중")) || (rentalStatusList.get(i).getRstatus().equals("연체중")) || (rentalStatusList.get(i).getRstatus().equals("정지")) ) { %>
 	        					<button type="submit" class="btn">반납</button>
 	    					<% } %>
 		           		</td>
