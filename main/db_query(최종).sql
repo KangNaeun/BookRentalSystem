@@ -130,8 +130,8 @@ INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, od_date, rs
 VALUES ((SELECT MAX(rentno) FROM rental)+1, 100, 1001, TO_DATE('2024-06-17', 'YYYY-MM-DD'), TO_DATE('2024-06-17', 'YYYY-MM-DD')+7, TO_DATE('2024-06-17', 'YYYY-MM-DD')+8, 'od');
 INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
 VALUES ((SELECT MAX(rentno) FROM rental)+1, 101, 1003, SYSDATE, SYSDATE+7, 'rt');
-INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
-VALUES ((SELECT MAX(rentno) FROM rental)+1, 101, 1004, TO_DATE('2024-04-17', 'YYYY-MM-DD'), TO_DATE('2024-04-17', 'YYYY-MM-DD')+7, 'cp');
+INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, comp_date, rstatus_id)
+VALUES ((SELECT MAX(rentno) FROM rental)+1, 101, 1004, TO_DATE('2024-04-17', 'YYYY-MM-DD'), TO_DATE('2024-04-17', 'YYYY-MM-DD')+7, TO_DATE('2024-04-17', 'YYYY-MM-DD')+3, 'cp');
 INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, od_date, rstatus_id)
 VALUES ((SELECT MAX(rentno) FROM rental)+1, 102, 1010, TO_DATE('2024-06-26', 'YYYY-MM-DD'), TO_DATE('2024-06-26', 'YYYY-MM-DD')+7, TO_DATE('2024-06-26', 'YYYY-MM-DD')+8, 'od');
 INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
@@ -140,8 +140,8 @@ INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
 VALUES ((SELECT MAX(rentno) FROM rental)+1, 103, 1006, SYSDATE, SYSDATE+7, 'rt');
 INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, od_date, rstatus_id)
 VALUES ((SELECT MAX(rentno) FROM rental)+1, 104, 1013, TO_DATE('2024-06-12', 'YYYY-MM-DD'), TO_DATE('2024-06-12', 'YYYY-MM-DD')+7, TO_DATE('2024-06-12', 'YYYY-MM-DD')+8, 'od');
-INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
-VALUES ((SELECT MAX(rentno) FROM rental)+1, 105, 1023, TO_DATE('2024-06-01', 'YYYY-MM-DD'), TO_DATE('2024-06-01', 'YYYY-MM-DD')+7, 'cp');
+INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, comp_date, rstatus_id)
+VALUES ((SELECT MAX(rentno) FROM rental)+1, 105, 1023, TO_DATE('2024-06-01', 'YYYY-MM-DD'), TO_DATE('2024-06-01', 'YYYY-MM-DD')+7, TO_DATE('2024-06-01', 'YYYY-MM-DD')+5, 'cp');
 INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
 VALUES ((SELECT MAX(rentno) FROM rental)+1, 106, 1009, SYSDATE, SYSDATE+7, 'rt');
 INSERT INTO rental(rentno, membno, bookno, rental_date, return_date, rstatus_id)
@@ -302,7 +302,7 @@ VALUES ((SELECT MAX(bookno) FROM book)+1, '나 혼자만 레벨업11', '장성�
 INSERT INTO memberinfo 
 VALUES (100, '강지은', '충청남도 천안시 서북구 성성2길 52-1', '01012345678', 'od');
 INSERT INTO memberinfo 
-VALUES ((SELECT MAX(membno) FROM memberinfo)+1, '김규빈', '충청남도 천안시 서북구 두정동 봉정로 374 창성빌딩 1층', '01023456789', 'rs');
+VALUES ((SELECT MAX(membno) FROM memberinfo)+1, '김규빈', '충청남도 천안시 서북구 두정동 봉정로 374 창성빌딩 1층', '01023456789', 'rt');
 INSERT INTO memberinfo 
 VALUES ((SELECT MAX(membno) FROM memberinfo)+1, '김혜민', '충청남도 천안시 동남구 먹거리3길 21', '01034567891', 'od');
 INSERT INTO memberinfo 
@@ -439,5 +439,3 @@ VALUES ((SELECT MAX(membno) FROM memberinfo)+1, '박진만', '충청남도 천�
 --DROP SEQUENCE emp_community_sequence;
 
 COMMIT;
-
-
