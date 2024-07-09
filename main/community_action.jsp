@@ -19,8 +19,6 @@
 		String message = request.getParameter("message");
 	
 		BookDAO bookDAO = new BookDAO();
-		
-		//낱개 저장
  		int result = bookDAO.setCommunity(empno, message);
 	
 		if ( result > 0 ){

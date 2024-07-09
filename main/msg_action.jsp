@@ -27,15 +27,10 @@
 			membnoInt = Integer.parseInt(membno);
 		} else { %>
 			<script>alert("회원번호에 숫자를 입력해주세요");</script>
-		<%}%>
-		<%
-
+		<%}
 		
-		MsgDAO msgDAO = new MsgDAO(); //msgDAO 객체 생성
-		
-		int result = msgDAO.insertMessage(membnoInt, message);//insertMessage메서드를 호출하고 알림을 전송할 내용을 result에 저장, 결과를 int로 반환
-		
-		System.out.println(result);
+		MsgDAO msgDAO = new MsgDAO();
+		int result = msgDAO.insertMessage(membnoInt, message);
 		
 		if(result > 0){%>
 			<script>
